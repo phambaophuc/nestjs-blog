@@ -1,4 +1,5 @@
-import { Entity, PrimaryColumn, Column, CreateDateColumn } from 'typeorm';
+import { Post } from 'src/modules/posts/entities/post.entity';
+import { Entity, PrimaryColumn, Column, OneToMany } from 'typeorm';
 
 @Entity('users')
 export class User {
@@ -9,11 +10,11 @@ export class User {
   email: string;
 
   @Column({ nullable: true })
-  fullName?: string;
+  fullName: string;
 
   @Column({ nullable: true })
   imageUrl?: string;
 
-  @CreateDateColumn()
-  createdAt: Date;
+  @OneToMany(() => Post, (post) => post.user)
+  posts: Post[];
 }

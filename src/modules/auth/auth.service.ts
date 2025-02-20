@@ -1,29 +1,32 @@
 import { Injectable } from '@nestjs/common';
 import { supabase } from '../../utils/supabase';
-import { UsersService } from '../users/users.service';
-import { SignUpDto } from './dtos/sign-up.dto';
-import { SignInDto } from './dtos/sign-in.dto';
+import { SignUpDto, SignUpResponseDto } from './dtos/sign-up.dto';
+import { SignInDto, SignInResponseDto } from './dtos/sign-in.dto';
+import { UserService } from '../users/user.service';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly userService: UserService) {}
 
-  async signUp(signUpDto: SignUpDto) {
-    const { email, password, fullName } = signUpDto;
+  async signUp(signUpDto: SignUpDto): Promise<SignUpResponseDto> {
+    const { email, password, fullName, imageUrl } = signUpDto;
     const { data, error } = await supabase.auth.signUp({ email, password });
 
     if (error) throw new Error(error.message);
 
-    await this.usersService.createOrUpdate({
-      id: data.user?.id,
-      email,
-      fullName,
-    });
+    if (data.user) {
+      await this.userService.createUser({
+        id: data.user.id,
+        fullName,
+        email,
+        imageUrl,
+      });
+    }
 
     return { message: 'User registered successfully' };
   }
 
-  async signIn(signInDto: SignInDto) {
+  async signIn(signInDto: SignInDto): Promise<SignInResponseDto> {
     const { email, password } = signInDto;
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
