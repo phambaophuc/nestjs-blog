@@ -8,10 +8,12 @@ export class UserService {
   constructor(private readonly usersRepository: UserRepository) {}
 
   async getUserByEmail(email: string): Promise<UserResponseDto> {
-    return this.usersRepository.findByEmail(email);
+    const user = await this.usersRepository.findByEmail(email);
+    return UserResponseDto.fromEntity(user);
   }
 
-  async createUser(user: CreateUserDto): Promise<CreateUserDto> {
-    return this.usersRepository.save(user);
+  async createUser(createUserDto: CreateUserDto): Promise<UserResponseDto> {
+    const user = await this.usersRepository.save(createUserDto);
+    return UserResponseDto.fromEntity(user);
   }
 }

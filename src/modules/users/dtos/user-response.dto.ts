@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { User } from '../entities/user.entity';
+import { UserEntity } from '../entities/user.entity';
 
 export class UserResponseDto {
   @ApiProperty({ example: 'user-1' })
@@ -14,7 +14,7 @@ export class UserResponseDto {
   @ApiProperty({ example: 'https://example.com/avatar.jpg', nullable: true })
   imageUrl?: string;
 
-  static fromEntity(user: User): UserResponseDto {
+  static fromEntity(user: UserEntity): UserResponseDto {
     return {
       id: user.id,
       fullName: user.fullName,
@@ -23,7 +23,7 @@ export class UserResponseDto {
     };
   }
 
-  static fromEntities(users: User[]): UserResponseDto[] {
+  static fromEntities(users: UserEntity[]): UserResponseDto[] {
     return users.map((user) => UserResponseDto.fromEntity(user));
   }
 }

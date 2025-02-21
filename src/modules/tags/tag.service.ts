@@ -6,11 +6,8 @@ import { TagResponseDto } from './dtos/tag-response.dto';
 export class TagService {
   constructor(private readonly tagRepository: TagRepository) {}
 
-  getAllTags(): Promise<TagResponseDto[]> {
-    return this.tagRepository.findAll();
-  }
-
-  getTagByName(name: string): Promise<TagResponseDto> {
-    return this.tagRepository.findByName(name);
+  async getAllTags(): Promise<TagResponseDto[]> {
+    const tag = await this.tagRepository.findAll();
+    return TagResponseDto.fromEntities(tag);
   }
 }

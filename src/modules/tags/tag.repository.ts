@@ -1,23 +1,27 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Tag } from './entities/tag.entity';
+import { TagEntity } from './entities/tag.entity';
 import { Repository } from 'typeorm';
-import { TagResponseDto } from './dtos/tag-response.dto';
 
 @Injectable()
 export class TagRepository {
   constructor(
-    @InjectRepository(Tag) private readonly tagRepo: Repository<Tag>,
+    @InjectRepository(TagEntity)
+    private readonly tagRepo: Repository<TagEntity>,
   ) {}
 
-  async findAll(): Promise<TagResponseDto[]> {
-    const tags = await this.tagRepo.find();
-    return TagResponseDto.fromEntities(tags);
+  findAll(): Promise<TagEntity[]> {
+    return this.tagRepo.find();
   }
 
-  async findByName(name: string): Promise<TagResponseDto> {
-    const tag = await this.tagRepo.findOne({ where: { name } });
-    if (!tag) throw new NotFoundException();
-    return TagResponseDto.fromEntity(tag);
+  async findOrCreate(name: string): Promise<TagEntity> {
+    let tag = await this.tagRepo.findOne({ where: { name } });
+
+    if (!tag) {
+      tag = this.tagRepo.create({ name });
+      return this.tagRepo.save(tag);
+    }
+
+    return tag;
   }
 }

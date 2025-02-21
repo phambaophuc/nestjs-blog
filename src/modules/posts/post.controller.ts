@@ -1,8 +1,24 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { QueryPostsDto } from './dtos/query-posts.dto';
 import { PostService } from './post.service';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { GetPostsResponseDto, PostResponseDto } from './dtos/post-response.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CreatePostDto } from './dtos/create-post.dto';
 
 @ApiTags('Posts')
 @Controller('posts')
@@ -19,5 +35,17 @@ export class PostController {
   @ApiOkResponse({ type: PostResponseDto })
   getPostById(@Param() id: string): Promise<PostResponseDto> {
     return this.postService.getPostById(id);
+  }
+
+  @Post()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiResponse({ status: 201, type: PostResponseDto })
+  createPost(
+    @Body() createPostDto: CreatePostDto,
+    @Request() req: Request,
+  ): Promise<PostResponseDto> {
+    const user = req['user'];
+    return this.postService.createPost(createPostDto, user);
   }
 }

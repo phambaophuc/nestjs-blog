@@ -1,20 +1,26 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { TagResponseDto } from 'src/modules/tags/dtos/tag-response.dto';
 import { UserResponseDto } from 'src/modules/users/dtos/user-response.dto';
-import { Post } from '../entities/post.entity';
+import { PostEntity } from '../entities/post.entity';
 
 export class PostResponseDto {
-  @ApiProperty({ example: '1' })
+  @ApiProperty()
   id: string;
 
-  @ApiProperty({ example: 'Bài viết 1' })
+  @ApiProperty()
   title: string;
 
-  @ApiProperty({ example: 'Nội dung bài viết...' })
+  @ApiProperty()
+  description: string;
+
+  @ApiProperty()
   content: string;
 
-  @ApiProperty({ example: '2024-02-20T10:00:00.000Z' })
+  @ApiProperty()
   createdAt: Date;
+
+  @ApiProperty()
+  updatedAt: Date;
 
   @ApiProperty({ type: () => UserResponseDto })
   user: UserResponseDto;
@@ -22,12 +28,14 @@ export class PostResponseDto {
   @ApiProperty({ type: () => TagResponseDto, nullable: true })
   tag?: TagResponseDto;
 
-  static fromEntity(post: Post): PostResponseDto {
+  static fromEntity(post: PostEntity): PostResponseDto {
     return {
       id: post.id,
       title: post.title,
+      description: post.description,
       content: post.content,
       createdAt: post.createdAt,
+      updatedAt: post.updatedAt,
       user: post.user,
       tag: post.tag,
     };

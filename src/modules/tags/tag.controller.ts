@@ -9,7 +9,7 @@ export class TagController {
   constructor(private readonly tagService: TagService) {}
 
   @Get()
-  @ApiOkResponse({ type: Array<TagResponseDto> })
+  @ApiOkResponse({ type: [TagResponseDto] })
   getAllTags(): Promise<TagResponseDto[]> {
     return this.tagService.getAllTags();
   }

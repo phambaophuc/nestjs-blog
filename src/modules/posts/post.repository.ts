@@ -1,15 +1,15 @@
 import { Repository } from 'typeorm';
-import { Post } from './entities/post.entity';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { PostEntity } from './entities/post.entity';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { QueryPostsDto } from './dtos/query-posts.dto';
-import { GetPostsResponseDto, PostResponseDto } from './dtos/post-response.dto';
+import { GetPostsResponseDto } from './dtos/post-response.dto';
 
 @Injectable()
 export class PostRepository {
   constructor(
-    @InjectRepository(Post)
-    private readonly postRepo: Repository<Post>,
+    @InjectRepository(PostEntity)
+    private readonly postRepo: Repository<PostEntity>,
   ) {}
 
   async findAll(query: QueryPostsDto): Promise<GetPostsResponseDto> {
@@ -41,9 +41,11 @@ export class PostRepository {
     };
   }
 
-  async findById(id: string): Promise<PostResponseDto> {
-    const post = await this.postRepo.findOne({ where: { id } });
-    if (!post) throw new NotFoundException();
-    return PostResponseDto.fromEntity(post);
+  findById(id: string): Promise<PostEntity> {
+    return this.postRepo.findOneOrFail({ where: { id } });
+  }
+
+  save(post: Partial<PostEntity>): Promise<PostEntity> {
+    return this.postRepo.save(post);
   }
 }

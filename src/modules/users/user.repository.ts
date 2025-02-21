@@ -1,27 +1,21 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { User } from './entities/user.entity';
-import { UserResponseDto } from './dtos/user-response.dto';
+import { UserEntity } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from './dtos/create-user.dto';
 
 @Injectable()
 export class UserRepository {
   constructor(
-    @InjectRepository(User)
-    private readonly userRepo: Repository<User>,
+    @InjectRepository(UserEntity)
+    private readonly userRepo: Repository<UserEntity>,
   ) {}
-  async findByEmail(email: string): Promise<UserResponseDto> {
-    const user = await this.userRepo.findOne({ where: { email } });
 
-    if (!user) {
-      throw new NotFoundException();
-    }
-
-    return UserResponseDto.fromEntity(user);
+  findByEmail(email: string): Promise<UserEntity> {
+    return this.userRepo.findOneOrFail({ where: { email } });
   }
 
-  async save(user: CreateUserDto): Promise<CreateUserDto> {
+  save(user: CreateUserDto): Promise<UserEntity> {
     return this.userRepo.save(user);
   }
 }
