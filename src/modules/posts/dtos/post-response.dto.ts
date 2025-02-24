@@ -17,6 +17,9 @@ export class PostResponseDto {
   content: string;
 
   @ApiProperty()
+  imageUrl: string;
+
+  @ApiProperty()
   createdAt: Date;
 
   @ApiProperty()
@@ -34,6 +37,7 @@ export class PostResponseDto {
       title: post.title,
       description: post.description,
       content: post.content,
+      imageUrl: post.imageUrl,
       createdAt: post.createdAt,
       updatedAt: post.updatedAt,
       user: post.user,

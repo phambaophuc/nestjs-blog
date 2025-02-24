@@ -1,27 +1,31 @@
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { PostEntity } from './entities/post.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { QueryPostsDto } from './dtos/query-posts.dto';
 import { GetPostsResponseDto } from './dtos/post-response.dto';
+import { TagEntity } from '../tags/entities/tag.entity';
+import { UserEntity } from '../users/entities/user.entity';
+import { CreatePostDto } from './dtos/create-post.dto';
 
 @Injectable()
 export class PostRepository {
   constructor(
     @InjectRepository(PostEntity)
     private readonly postRepo: Repository<PostEntity>,
+    private readonly dataSource: DataSource,
   ) {}
 
   async findAll(query: QueryPostsDto): Promise<GetPostsResponseDto> {
-    const { tagName, page = 1, limit = 10 } = query;
+    const { tag, page = 1, limit = 10 } = query;
 
     const queryBuilder = this.postRepo
       .createQueryBuilder('post')
       .leftJoinAndSelect('post.user', 'user')
       .leftJoinAndSelect('post.tag', 'tag');
 
-    if (tagName) {
-      queryBuilder.where('tag.name = :tagName', { tagName });
+    if (tag) {
+      queryBuilder.where('tag.name = :tag', { tag });
     }
 
     const total = await queryBuilder.getCount();
@@ -36,16 +40,56 @@ export class PostRepository {
     return {
       data: posts,
       limit,
-      page,
+      page: Number(page),
       totalPages,
     };
   }
 
   findById(id: string): Promise<PostEntity> {
-    return this.postRepo.findOneOrFail({ where: { id } });
+    return this.postRepo.findOneOrFail({
+      where: { id },
+      relations: { user: true, tag: true },
+    });
   }
 
-  save(post: Partial<PostEntity>): Promise<PostEntity> {
-    return this.postRepo.save(post);
+  async create(
+    createPostDto: CreatePostDto,
+    user: UserEntity,
+  ): Promise<PostEntity> {
+    const { title, description, content, imageUrl, tagName } = createPostDto;
+    const queryRunner = this.dataSource.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      let tag = await queryRunner.manager.findOne(TagEntity, {
+        where: { name: tagName },
+      });
+
+      if (!tag) {
+        tag = queryRunner.manager.create(TagEntity, { name: tagName });
+        await queryRunner.manager.save(tag);
+      }
+
+      const post = queryRunner.manager.create(PostEntity, {
+        title,
+        description,
+        content,
+        imageUrl,
+        user,
+        tag,
+      });
+
+      const savedPost: PostEntity = await queryRunner.manager.save(post);
+
+      await queryRunner.commitTransaction();
+      return savedPost;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 }

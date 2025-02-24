@@ -20,5 +20,5 @@ export class QueryPostsDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  tagName?: string;
+  tag?: string;
 }

@@ -11,6 +11,10 @@ export class UserRepository {
     private readonly userRepo: Repository<UserEntity>,
   ) {}
 
+  findAll(): Promise<UserEntity[]> {
+    return this.userRepo.find();
+  }
+
   findByEmail(email: string): Promise<UserEntity> {
     return this.userRepo.findOneOrFail({ where: { email } });
   }

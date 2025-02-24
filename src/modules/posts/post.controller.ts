@@ -33,7 +33,7 @@ export class PostController {
 
   @Get(':id')
   @ApiOkResponse({ type: PostResponseDto })
-  getPostById(@Param() id: string): Promise<PostResponseDto> {
+  getPostById(@Param('id') id: string): Promise<PostResponseDto> {
     return this.postService.getPostById(id);
   }
 

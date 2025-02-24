@@ -14,14 +14,7 @@ export class TagRepository {
     return this.tagRepo.find();
   }
 
-  async findOrCreate(name: string): Promise<TagEntity> {
-    let tag = await this.tagRepo.findOne({ where: { name } });
-
-    if (!tag) {
-      tag = this.tagRepo.create({ name });
-      return this.tagRepo.save(tag);
-    }
-
-    return tag;
+  save(tag: Partial<TagEntity>): Promise<TagEntity> {
+    return this.tagRepo.save(tag);
   }
 }
