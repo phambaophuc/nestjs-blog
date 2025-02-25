@@ -1,8 +1,8 @@
 import { PostEntity } from 'src/modules/posts/entities/post.entity';
 import { Entity, PrimaryColumn, Column, OneToMany } from 'typeorm';
 
-@Entity('users')
-export class UserEntity {
+@Entity('authors')
+export class AuthorEntity {
   @PrimaryColumn('uuid')
   id: string;
 
@@ -10,11 +10,11 @@ export class UserEntity {
   email: string;
 
   @Column({ nullable: true })
-  fullName: string;
+  displayName: string;
 
   @Column({ nullable: true })
-  imageUrl?: string;
+  avatarUrl?: string;
 
-  @OneToMany(() => PostEntity, (post) => post.user)
+  @OneToMany(() => PostEntity, (post) => post.author)
   posts: PostEntity[];
 }

@@ -4,7 +4,7 @@ import { IsEmail, IsNotEmpty, IsOptional, MinLength } from 'class-validator';
 export class SignUpDto {
   @ApiProperty()
   @IsNotEmpty()
-  fullName: string;
+  displayName: string;
 
   @ApiProperty()
   @IsEmail({}, { message: 'Invalid email' })
@@ -18,7 +18,7 @@ export class SignUpDto {
 
   @ApiProperty()
   @IsOptional()
-  imageUrl?: string;
+  avatarUrl?: string;
 }
 
 export class SignUpResponseDto {
