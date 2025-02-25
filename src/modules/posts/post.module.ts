@@ -10,6 +10,6 @@ import { AuthModule } from '../auth/auth.module';
   imports: [TypeOrmModule.forFeature([PostEntity]), AuthModule],
   providers: [PostRepository, PostService],
   controllers: [PostController],
-  exports: [PostService],
+  exports: [PostRepository],
 })
 export class PostModule {}

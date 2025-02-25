@@ -19,6 +19,7 @@ import {
 import { GetPostsResponseDto, PostResponseDto } from './dtos/post-response.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CreatePostDto } from './dtos/create-post.dto';
+import { User } from '@supabase/supabase-js';
 
 @ApiTags('Posts')
 @Controller('posts')
@@ -45,7 +46,10 @@ export class PostController {
     @Body() createPostDto: CreatePostDto,
     @Request() req: Request,
   ): Promise<PostResponseDto> {
-    const user = req['user'];
-    return this.postService.createPost(createPostDto, user);
+    const { id } = req['user'] as User;
+    return this.postService.createPost({
+      ...createPostDto,
+      author: id,
+    });
   }
 }

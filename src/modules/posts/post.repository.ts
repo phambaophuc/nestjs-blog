@@ -5,7 +5,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { QueryPostsDto } from './dtos/query-posts.dto';
 import { GetPostsResponseDto } from './dtos/post-response.dto';
 import { TagEntity } from '../tags/entities/tag.entity';
-import { UserEntity } from '../users/entities/user.entity';
 import { CreatePostDto } from './dtos/create-post.dto';
 
 @Injectable()
@@ -21,7 +20,7 @@ export class PostRepository {
 
     const queryBuilder = this.postRepo
       .createQueryBuilder('post')
-      .leftJoinAndSelect('post.user', 'user')
+      .leftJoinAndSelect('post.author', 'author')
       .leftJoinAndSelect('post.tag', 'tag');
 
     if (tag) {
@@ -48,15 +47,12 @@ export class PostRepository {
   findById(id: string): Promise<PostEntity> {
     return this.postRepo.findOneOrFail({
       where: { id },
-      relations: { user: true, tag: true },
+      relations: { author: true, tag: true },
     });
   }
 
-  async create(
-    createPostDto: CreatePostDto,
-    user: UserEntity,
-  ): Promise<PostEntity> {
-    const { title, description, content, imageUrl, tagName } = createPostDto;
+  async create(createPostDto: CreatePostDto): Promise<PostEntity> {
+    const { tagName } = createPostDto;
     const queryRunner = this.dataSource.createQueryRunner();
 
     await queryRunner.connect();
@@ -73,12 +69,10 @@ export class PostRepository {
       }
 
       const post = queryRunner.manager.create(PostEntity, {
-        title,
-        description,
-        content,
-        imageUrl,
-        user,
-        tag,
+        ...createPostDto,
+        author: {
+          id: createPostDto.author,
+        },
       });
 
       const savedPost: PostEntity = await queryRunner.manager.save(post);

@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { TagResponseDto } from 'src/modules/tags/dtos/tag-response.dto';
-import { UserResponseDto } from 'src/modules/users/dtos/user-response.dto';
 import { PostEntity } from '../entities/post.entity';
+import { AuthorResponseDto } from 'src/modules/authors/dtos/author-response.dto';
 
 export class PostResponseDto {
   @ApiProperty()
@@ -25,8 +25,8 @@ export class PostResponseDto {
   @ApiProperty()
   updatedAt: Date;
 
-  @ApiProperty({ type: () => UserResponseDto })
-  user: UserResponseDto;
+  @ApiProperty({ type: () => AuthorResponseDto })
+  author: AuthorResponseDto;
 
   @ApiProperty({ type: () => TagResponseDto, nullable: true })
   tag?: TagResponseDto;
@@ -40,7 +40,7 @@ export class PostResponseDto {
       imageUrl: post.imageUrl,
       createdAt: post.createdAt,
       updatedAt: post.updatedAt,
-      user: post.user,
+      author: post.author,
       tag: post.tag,
     };
   }
