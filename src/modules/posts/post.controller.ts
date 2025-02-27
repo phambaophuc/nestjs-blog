@@ -49,7 +49,7 @@ export class PostController {
     const { id } = req['user'] as User;
     return this.postService.createPost({
       ...createPostDto,
-      author: id,
+      authorId: id,
     });
   }
 }
