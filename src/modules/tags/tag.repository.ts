@@ -14,6 +14,10 @@ export class TagRepository {
     return this.tagRepo.find();
   }
 
+  findById(id: string): Promise<TagEntity> {
+    return this.tagRepo.findOneOrFail({ where: { id } });
+  }
+
   save(tag: Partial<TagEntity>): Promise<TagEntity> {
     return this.tagRepo.save(tag);
   }
