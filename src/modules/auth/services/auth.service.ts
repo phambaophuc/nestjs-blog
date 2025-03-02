@@ -3,16 +3,16 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { SignUpDto, SignUpResponseDto } from './dtos/sign-up.dto';
-import { SignInDto, SignInResponseDto } from './dtos/sign-in.dto';
-import { AuthorRepository } from '../authors/author.repository';
+import { SignUpDto, SignUpResponseDto } from '../dtos/sign-up.dto';
+import { SignInDto, SignInResponseDto } from '../dtos/sign-in.dto';
 import { SupabaseService } from 'src/utils/supabase/supabase.service';
+import { AuthorService } from '../../authors/services/author.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly supabaseService: SupabaseService,
-    private readonly authorRepo: AuthorRepository,
+    private readonly authorService: AuthorService,
   ) {}
 
   async signUp(signUpDto: SignUpDto): Promise<SignUpResponseDto> {
@@ -23,7 +23,7 @@ export class AuthService {
       throw new BadRequestException('User registration failed');
     }
 
-    await this.authorRepo.save({
+    await this.authorService.create({
       id: data.user.id,
       displayName,
       email,

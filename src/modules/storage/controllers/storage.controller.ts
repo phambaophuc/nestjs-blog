@@ -8,13 +8,15 @@ import {
   Get,
   ParseFilePipe,
   FileTypeValidator,
+  Res,
+  HttpStatus,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { StorageService } from './storage.service';
-import { Express } from 'express';
+import { Express, Response } from 'express';
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { StorageService } from '../services/storage.service';
 
-@ApiTags('Storage')
+@ApiTags('StorageController')
 @Controller('storage')
 export class StorageController {
   constructor(private readonly storageService: StorageService) {}
@@ -33,7 +35,8 @@ export class StorageController {
       },
     },
   })
-  async uploadFile(
+  public async uploadFile(
+    @Res() response: Response,
     @UploadedFile(
       new ParseFilePipe({
         validators: [new FileTypeValidator({ fileType: 'image/*' })],
@@ -50,16 +53,28 @@ export class StorageController {
 
     await this.storageService.uploadFile(fileName, file.buffer, file.mimetype);
 
-    return { url: this.storageService.getFileUrl(fileName) };
+    return response.status(HttpStatus.OK).json({
+      url: this.storageService.getFileUrl(fileName),
+    });
   }
 
   @Get(':filename')
-  getFileUrl(@Param('filename') filename: string) {
-    return { url: this.storageService.getFileUrl(filename) };
+  public getFileUrl(
+    @Res() response: Response,
+    @Param('filename') filename: string,
+  ) {
+    return response
+      .status(HttpStatus.OK)
+      .json({ url: this.storageService.getFileUrl(filename) });
   }
 
   @Delete(':filename')
-  deleteFile(@Param('filename') filename: string) {
-    return this.storageService.deleteFile(filename);
+  public deleteFile(
+    @Res() response: Response,
+    @Param('filename') filename: string,
+  ) {
+    return response
+      .status(HttpStatus.OK)
+      .json(this.storageService.deleteFile(filename));
   }
 }
