@@ -5,16 +5,16 @@ import { AuthorEntity } from 'src/modules/authors/entities/author.entity';
 
 @Entity('posts')
 export class PostEntity extends BaseEntity {
-  @Column()
+  @Column({ nullable: false })
   title: string;
 
-  @Column()
+  @Column({ nullable: true })
   description: string;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'text', nullable: true })
   content: string;
 
-  @Column()
+  @Column({ nullable: true })
   imageUrl: string;
 
   @ManyToOne(() => TagEntity, (tag) => tag.posts, { onDelete: 'CASCADE' })

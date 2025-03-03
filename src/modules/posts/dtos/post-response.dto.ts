@@ -44,6 +44,10 @@ export class PostResponseDto {
       tag: post.tag,
     };
   }
+
+  static fromEntities(posts: PostEntity[]): PostResponseDto[] {
+    return posts.map((post) => PostResponseDto.fromEntity(post));
+  }
 }
 
 export class GetPostsResponseDto {

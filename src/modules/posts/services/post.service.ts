@@ -47,6 +47,15 @@ export class PostService {
     }
   }
 
+  async findAllRelated(id: string, limit?: number): Promise<PostResponseDto[]> {
+    try {
+      const relatedPosts = await this.postRepository.findAllRelated(id, limit);
+      return PostResponseDto.fromEntities(relatedPosts);
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
   async create(createPostDto: CreatePostDto): Promise<PostResponseDto> {
     try {
       const post = await this.postRepository.store(createPostDto);

@@ -4,7 +4,7 @@ import { PostEntity } from 'src/modules/posts/entities/post.entity';
 
 @Entity('tags')
 export class TagEntity extends BaseEntity {
-  @Column({ unique: true })
+  @Column({ unique: true, nullable: false })
   name: string;
 
   @OneToMany(() => PostEntity, (post) => post.tag)

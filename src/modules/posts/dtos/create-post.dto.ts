@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsUUID } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsUUID } from 'class-validator';
 
 export class CreatePostDto {
   @ApiProperty()
@@ -7,15 +7,15 @@ export class CreatePostDto {
   title: string;
 
   @ApiProperty()
-  @IsNotEmpty()
+  @IsOptional()
   description: string;
 
   @ApiProperty()
-  @IsNotEmpty()
+  @IsOptional()
   content: string;
 
   @ApiProperty()
-  @IsNotEmpty()
+  @IsOptional()
   imageUrl: string;
 
   @ApiProperty()

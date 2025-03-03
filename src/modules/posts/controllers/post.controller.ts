@@ -46,6 +46,12 @@ export class PostController {
     return this.postService.findById(id);
   }
 
+  @Get(':id/related')
+  @ApiOkResponse({ type: [PostResponseDto] })
+  public async findRelatedPosts(@Param('id') id: string) {
+    return this.postService.findAllRelated(id);
+  }
+
   @Post()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -61,7 +67,7 @@ export class PostController {
   }
 
   @Delete(':id')
-  public async delete(@Res() response: Response, @Param() id: string) {
+  public async delete(@Res() response: Response, @Param('id') id: string) {
     await this.postService.delete(id);
     return response.status(HttpStatus.OK).json({
       message: 'Post has been deleted successfully',

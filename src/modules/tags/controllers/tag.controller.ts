@@ -27,7 +27,7 @@ export class TagController {
 
   @Get(':id')
   @ApiOkResponse({ type: TagResponseDto })
-  public async findById(@Param() id: string): Promise<TagResponseDto> {
+  public async findById(@Param('id') id: string): Promise<TagResponseDto> {
     return this.tagService.findById(id);
   }
 
@@ -40,7 +40,7 @@ export class TagController {
   }
 
   @Delete(':id')
-  public async delete(@Res() response: Response, @Param() id: string) {
+  public async delete(@Res() response: Response, @Param('id') id: string) {
     await this.tagService.delete(id);
     return response.status(HttpStatus.OK).json({
       message: 'Tag has been deleted successfully',

@@ -6,10 +6,10 @@ export class AuthorEntity {
   @PrimaryColumn('uuid')
   id: string;
 
-  @Column({ unique: true })
+  @Column({ nullable: false, unique: true })
   email: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: false })
   displayName: string;
 
   @Column({ nullable: true })

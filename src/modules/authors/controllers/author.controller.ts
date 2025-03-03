@@ -24,12 +24,12 @@ export class AuthorController {
 
   @Get(':id')
   @ApiOkResponse({ type: AuthorResponseDto })
-  public async findById(@Param() id: string): Promise<AuthorResponseDto> {
+  public async findById(@Param('id') id: string): Promise<AuthorResponseDto> {
     return this.authorService.findById(id);
   }
 
   @Delete(':id')
-  public async delete(@Res() response: Response, @Param() id: string) {
+  public async delete(@Res() response: Response, @Param('id') id: string) {
     await this.authorService.delete(id);
     return response.status(HttpStatus.OK).json({
       message: 'Author has been deleted successfully',

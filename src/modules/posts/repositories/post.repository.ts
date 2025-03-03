@@ -31,6 +31,37 @@ export class PostRepository extends Repository<PostEntity> {
     return queryBuilder.getMany();
   }
 
+  public async findAllRelated(
+    id: string,
+    limit?: number,
+  ): Promise<PostEntity[]> {
+    const currentPost = await this.postRepository.findOne({
+      where: { id },
+      relations: { tag: true },
+    });
+
+    if (!currentPost) return [];
+
+    const relatedPosts = await this.postRepository
+      .createQueryBuilder('post')
+      .innerJoinAndSelect('post.tag', 'tag', 'tag.id = :tagId', {
+        tagId: currentPost.tag.id,
+      })
+      .leftJoinAndSelect('post.author', 'author')
+      .where('post.id != :id', { id })
+      .limit(limit ?? 5)
+      .getMany();
+
+    return relatedPosts;
+  }
+
+  public async findByTagId(id: string): Promise<PostEntity[]> {
+    return this.find({
+      where: { tag: { id } },
+      relations: { tag: true, author: true },
+    });
+  }
+
   public async findById(id: string): Promise<PostEntity | null> {
     return this.findOne({
       where: { id },
