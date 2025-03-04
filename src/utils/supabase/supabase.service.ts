@@ -5,10 +5,10 @@ import { ENV } from 'src/constants/env.constants';
 @Injectable()
 export class SupabaseService {
   private readonly supabase: SupabaseClient;
-  private readonly BUCKET = ENV.SUPABASE_BUCKET;
+  private readonly BUCKET = ENV.SUPABASE.BUCKET;
 
   constructor() {
-    this.supabase = createClient(ENV.SUPABASE_URL, ENV.SUPABASE_KEY);
+    this.supabase = createClient(ENV.SUPABASE.URL, ENV.SUPABASE.KEY);
   }
 
   signUp(body: {

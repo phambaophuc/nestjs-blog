@@ -13,7 +13,16 @@ export const ENV = {
     PASSWORD: process.env.DB_PASSWORD,
     NAME: process.env.DB_DATABASE,
   },
-  SUPABASE_URL: process.env.SUPABASE_URL ?? '',
-  SUPABASE_KEY: process.env.SUPABASE_KEY ?? '',
-  SUPABASE_BUCKET: process.env.SUPABASE_BUCKET ?? '',
+  SUPABASE: {
+    URL: process.env.SUPABASE_URL ?? '',
+    KEY: process.env.SUPABASE_KEY ?? '',
+    BUCKET: process.env.SUPABASE_BUCKET ?? '',
+  },
+  EMAIL: {
+    HOST: process.env.EMAIL_HOST ?? '',
+    PORT: process.env.EMAIL_PORT ?? '',
+    USER: process.env.EMAIL_USER ?? '',
+    PASS: process.env.EMAIL_PASS ?? '',
+    FROM: process.env.EMAIL_FROM ?? '',
+  },
 };

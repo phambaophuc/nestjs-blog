@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
-import { DatabaseModule } from './modules/database.module';
+import { DatabaseModule } from './config/database.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { PostModule } from './modules/posts/post.module';
 import { TagModule } from './modules/tags/tag.module';
 import { AuthorModule } from './modules/authors/author.module';
 import { StorageModule } from './modules/storage/storage.module';
+import { SubscriberModule } from './modules/subscribers/subscriber.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { StorageModule } from './modules/storage/storage.module';
     PostModule,
     TagModule,
     StorageModule,
+    SubscriberModule,
   ],
 })
 export class AppModule {}
