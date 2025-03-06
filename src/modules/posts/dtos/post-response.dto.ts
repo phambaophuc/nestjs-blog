@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { TagResponseDto } from 'src/modules/tags/dtos/tag-response.dto';
 import { PostEntity } from '../entities/post.entity';
 import { AuthorResponseDto } from 'src/modules/authors/dtos/author-response.dto';
+import { CommentResponseDto } from 'src/modules/comments/dtos/comment-response.dto';
 
 export class PostResponseDto {
   @ApiProperty()
@@ -28,8 +29,11 @@ export class PostResponseDto {
   @ApiProperty({ type: () => AuthorResponseDto })
   author: AuthorResponseDto;
 
-  @ApiProperty({ type: () => TagResponseDto, nullable: true })
-  tag?: TagResponseDto;
+  @ApiProperty({ type: () => TagResponseDto })
+  tag: TagResponseDto;
+
+  @ApiProperty({ type: () => [CommentResponseDto], nullable: true })
+  comments?: CommentResponseDto[];
 
   static fromEntity(post: PostEntity): PostResponseDto {
     return {
@@ -40,8 +44,11 @@ export class PostResponseDto {
       imageUrl: post.imageUrl,
       createdAt: post.createdAt,
       updatedAt: post.updatedAt,
-      author: post.author,
-      tag: post.tag,
+      author: AuthorResponseDto.fromEntity(post.author),
+      tag: TagResponseDto.fromEntity(post.tag),
+      comments: post.comments
+        ? CommentResponseDto.fromEntities(post.comments)
+        : [],
     };
   }
 
