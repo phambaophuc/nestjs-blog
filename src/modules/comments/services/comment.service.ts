@@ -30,7 +30,7 @@ export class CommentService {
       }
 
       const newComment = await this.commentRepo.store(comment);
-      return CommentResponseDto.fromEntity(newComment);
+      return this.findById(newComment.id);
     } catch (error) {
       throw new BadRequestException(error.message);
     }

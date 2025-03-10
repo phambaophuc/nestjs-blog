@@ -17,14 +17,14 @@ export class CommentRepository extends Repository<CommentEntity> {
     return this.find({
       where: { parent: IsNull() },
       relations: { author: true, replies: { author: true } },
-      order: { createdAt: 'ASC' },
+      order: { createdAt: 'DESC' },
     });
   }
 
   public async findById(id: string): Promise<CommentEntity | null> {
     return this.findOne({
-      where: { id, parent: IsNull() },
-      relations: { parent: true, replies: { author: true } },
+      where: { id },
+      relations: { author: true, replies: { author: true } },
     });
   }
 
