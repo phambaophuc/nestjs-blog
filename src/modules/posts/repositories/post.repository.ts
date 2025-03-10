@@ -1,4 +1,4 @@
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreatePostDto } from '../dtos/create-post.dto';
@@ -25,7 +25,7 @@ export class PostRepository extends Repository<PostEntity> {
       .leftJoinAndSelect('post.tag', 'tag');
 
     if (filter.tag) {
-      queryBuilder.where('tag.name = :tag', { tag: filter.tag });
+      queryBuilder.where('LOWER(tag.name) = LOWER(:tag)', { tag: filter.tag });
     }
 
     return queryBuilder.getMany();
@@ -64,8 +64,12 @@ export class PostRepository extends Repository<PostEntity> {
 
   public async findById(id: string): Promise<PostEntity | null> {
     return this.findOne({
-      where: { id },
-      relations: { author: true, tag: true },
+      where: { id, comments: { parent: IsNull() } },
+      relations: {
+        author: true,
+        tag: true,
+        comments: { author: true, replies: { author: true } },
+      },
     });
   }
 

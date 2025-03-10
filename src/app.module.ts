@@ -6,6 +6,7 @@ import { TagModule } from './modules/tags/tag.module';
 import { AuthorModule } from './modules/authors/author.module';
 import { StorageModule } from './modules/storage/storage.module';
 import { SubscriberModule } from './modules/subscribers/subscriber.module';
+import { CommentModule } from './modules/comments/comment.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { SubscriberModule } from './modules/subscribers/subscriber.module';
     TagModule,
     StorageModule,
     SubscriberModule,
+    CommentModule,
   ],
 })
 export class AppModule {}
