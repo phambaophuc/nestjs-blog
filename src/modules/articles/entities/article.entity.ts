@@ -4,8 +4,8 @@ import { TagEntity } from '../../tags/entities/tag.entity';
 import { AuthorEntity } from 'src/modules/authors/entities/author.entity';
 import { CommentEntity } from 'src/modules/comments/entities/comment.entity';
 
-@Entity('posts')
-export class PostEntity extends BaseEntity {
+@Entity('articles')
+export class ArticleEntity extends BaseEntity {
   @Column({ nullable: false })
   title: string;
 
@@ -18,14 +18,14 @@ export class PostEntity extends BaseEntity {
   @Column({ nullable: true })
   imageUrl: string;
 
-  @ManyToOne(() => TagEntity, (tag) => tag.posts, { onDelete: 'CASCADE' })
+  @ManyToOne(() => TagEntity, (tag) => tag.articles, { onDelete: 'CASCADE' })
   tag: TagEntity;
 
-  @ManyToOne(() => AuthorEntity, (author) => author.posts, {
+  @ManyToOne(() => AuthorEntity, (author) => author.articles, {
     onDelete: 'CASCADE',
   })
   author: AuthorEntity;
 
-  @OneToMany(() => CommentEntity, (comment) => comment.post, { cascade: true })
+  @OneToMany(() => CommentEntity, (comment) => comment.article, { cascade: true })
   comments: CommentEntity[];
 }

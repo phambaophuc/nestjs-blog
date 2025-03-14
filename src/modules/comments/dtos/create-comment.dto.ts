@@ -9,7 +9,7 @@ export class CreateCommentDto {
 
   @ApiProperty()
   @IsUUID()
-  postId: string;
+  articleId: string;
 
   @ApiProperty({ required: false })
   @IsOptional()

@@ -1,5 +1,5 @@
 import { CommentEntity } from 'src/modules/comments/entities/comment.entity';
-import { PostEntity } from 'src/modules/posts/entities/post.entity';
+import { ArticleEntity } from 'src/modules/articles/entities/article.entity';
 import { Entity, PrimaryColumn, Column, OneToMany } from 'typeorm';
 
 @Entity('authors')
@@ -16,8 +16,8 @@ export class AuthorEntity {
   @Column({ nullable: true })
   avatarUrl?: string;
 
-  @OneToMany(() => PostEntity, (post) => post.author)
-  posts: PostEntity[];
+  @OneToMany(() => ArticleEntity, (article) => article.author)
+  articles: ArticleEntity[];
 
   @OneToMany(() => CommentEntity, (comment) => comment.author)
   comments: CommentEntity[];

@@ -5,22 +5,22 @@ import {
 } from '@nestjs/common';
 import { CommentRepository } from '../repositories/comment.repository';
 import { CreateCommentDto } from '../dtos/create-comment.dto';
-import { PostService } from 'src/modules/posts/services/post.service';
+import { ArticleService } from 'src/modules/articles/services/article.service';
 import { CommentResponseDto } from '../dtos/comment-response.dto';
 
 @Injectable()
 export class CommentService {
   constructor(
     private readonly commentRepo: CommentRepository,
-    private readonly postService: PostService,
+    private readonly articleService: ArticleService,
   ) {}
 
   async create(comment: CreateCommentDto): Promise<CommentResponseDto> {
     try {
-      const { postId, parentId } = comment;
+      const { articleId, parentId } = comment;
 
-      const post = await this.postService.findById(postId);
-      if (!post) throw new NotFoundException('Post not found.');
+      const article = await this.articleService.findById(articleId);
+      if (!article) throw new NotFoundException('Article not found.');
 
       let parentComment;
       if (parentId) {

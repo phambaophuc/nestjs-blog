@@ -14,15 +14,15 @@ export class AuthorRepository extends Repository<AuthorEntity> {
   }
 
   public async findAll(): Promise<AuthorEntity[]> {
-    return this.find({ relations: { posts: true } });
+    return this.find({ relations: { articles: true } });
   }
 
   public async findById(id: string): Promise<AuthorEntity | null> {
-    return this.findOne({ where: { id }, relations: { posts: true } });
+    return this.findOne({ where: { id }, relations: { articles: true } });
   }
 
   public async findByEmail(email: string): Promise<AuthorEntity | null> {
-    return this.findOne({ where: { email }, relations: { posts: true } });
+    return this.findOne({ where: { email }, relations: { articles: true } });
   }
 
   public async store(author: CreateAuthorDto): Promise<AuthorEntity> {

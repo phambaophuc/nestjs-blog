@@ -31,7 +31,7 @@ export class CommentRepository extends Repository<CommentEntity> {
   public async store(comment: CreateCommentDto): Promise<CommentEntity> {
     const newComment = this.create({
       ...comment,
-      post: { id: comment.postId },
+      article: { id: comment.articleId },
       author: { id: comment.authorId },
       parent: { id: comment.parentId },
     });
