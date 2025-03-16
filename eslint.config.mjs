@@ -2,6 +2,7 @@
 import eslint from '@eslint/js';
 import eslintPluginPrettier from 'eslint-plugin-prettier';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
+import eslintPluginSimpleImportSort from 'eslint-plugin-simple-import-sort';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
@@ -29,15 +30,18 @@ export default tseslint.config(
   {
     plugins: {
       prettier: eslintPluginPrettier,
+      'simple-import-sort': eslintPluginSimpleImportSort,
     },
     rules: {
       'prettier/prettier': ['error', { endOfLine: 'auto' }],
+      'simple-import-sort/imports': 'error',
+      'simple-import-sort/exports': 'error',
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-floating-promises': 'off',
       '@typescript-eslint/no-unsafe-argument': 'off',
       '@typescript-eslint/no-unsafe-assignment': 'off',
       '@typescript-eslint/no-unsafe-call': 'off',
-      '@typescript-eslint/no-unsafe-member-access': 'off'
+      '@typescript-eslint/no-unsafe-member-access': 'off',
     },
   },
 );

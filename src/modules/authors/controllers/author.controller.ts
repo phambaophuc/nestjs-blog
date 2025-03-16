@@ -7,9 +7,10 @@ import {
   Res,
 } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { AuthorService } from '../services/author.service';
-import { AuthorResponseDto } from '../dtos/author-response.dto';
 import { Response } from 'express';
+
+import { AuthorResponseDto } from '../dtos/author-response.dto';
+import { AuthorService } from '../services/author.service';
 
 @ApiTags('AuthorController')
 @Controller('authors')

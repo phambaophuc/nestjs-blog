@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+
 import { AuthorEntity } from '../entities/author.entity';
 
 export class AuthorResponseDto {

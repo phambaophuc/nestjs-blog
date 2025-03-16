@@ -1,6 +1,6 @@
+import { ENV } from '@constants/env.constants';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { ENV } from 'src/constants/env.constants';
 
 @Injectable()
 export class SupabaseService {

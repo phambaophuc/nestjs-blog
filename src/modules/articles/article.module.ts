@@ -1,12 +1,13 @@
+import { AuthModule } from '@modules/auth/auth.module';
+import { SubscriberModule } from '@modules/subscribers/subscriber.module';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ArticleEntity } from './entities/article.entity';
-import { ArticleService } from './services/article.service';
-import { AuthModule } from '../auth/auth.module';
+import { EmailModule } from '@utils/nodemailer/email.module';
+
 import { ArticleController } from './controllers/article.controller';
+import { ArticleEntity } from './entities/article.entity';
 import { ArticleRepository } from './repositories/article.repository';
-import { SubscriberModule } from '../subscribers/subscriber.module';
-import { EmailModule } from 'src/utils/nodemailer/email.module';
+import { ArticleService } from './services/article.service';
 
 @Module({
   imports: [

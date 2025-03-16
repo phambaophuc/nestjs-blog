@@ -1,5 +1,6 @@
+import { AuthorResponseDto } from '@modules/authors/dtos/author-response.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { AuthorResponseDto } from 'src/modules/authors/dtos/author-response.dto';
+
 import { CommentEntity } from '../entities/comment.entity';
 
 export class CommentResponseDto {

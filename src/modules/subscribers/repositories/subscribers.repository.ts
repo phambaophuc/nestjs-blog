@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
-import { SubscriberEntity } from '../entities/subscriber.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+
 import { CreateSubscriberDto } from '../dtos/create-subscriber.dto';
+import { SubscriberEntity } from '../entities/subscriber.entity';
 
 @Injectable()
 export class SubscriberRepository extends Repository<SubscriberEntity> {

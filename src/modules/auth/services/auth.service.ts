@@ -1,12 +1,13 @@
+import { AuthorService } from '@modules/authors/services/author.service';
 import {
   BadRequestException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { SignUpDto, SignUpResponseDto } from '../dtos/sign-up.dto';
+import { SupabaseService } from '@utils/supabase/supabase.service';
+
 import { SignInDto, SignInResponseDto } from '../dtos/sign-in.dto';
-import { SupabaseService } from 'src/utils/supabase/supabase.service';
-import { AuthorService } from '../../authors/services/author.service';
+import { SignUpDto, SignUpResponseDto } from '../dtos/sign-up.dto';
 
 @Injectable()
 export class AuthService {

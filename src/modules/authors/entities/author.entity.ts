@@ -1,6 +1,6 @@
-import { CommentEntity } from 'src/modules/comments/entities/comment.entity';
-import { ArticleEntity } from 'src/modules/articles/entities/article.entity';
-import { Entity, PrimaryColumn, Column, OneToMany } from 'typeorm';
+import { ArticleEntity } from '@modules/articles/entities/article.entity';
+import { CommentEntity } from '@modules/comments/entities/comment.entity';
+import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
 
 @Entity('authors')
 export class AuthorEntity {

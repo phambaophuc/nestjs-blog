@@ -1,19 +1,20 @@
 import {
   Controller,
+  Delete,
+  FileTypeValidator,
+  Get,
+  HttpStatus,
+  Param,
+  ParseFilePipe,
   Post,
+  Res,
   UploadedFile,
   UseInterceptors,
-  Param,
-  Delete,
-  Get,
-  ParseFilePipe,
-  FileTypeValidator,
-  Res,
-  HttpStatus,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Express, Response } from 'express';
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { Express, Response } from 'express';
+
 import { StorageService } from '../services/storage.service';
 
 @ApiTags('StorageController')

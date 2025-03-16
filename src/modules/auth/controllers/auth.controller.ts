@@ -1,13 +1,14 @@
 import {
-  Controller,
-  Post,
   Body,
+  Controller,
+  Get,
+  Post,
   Request,
   UseGuards,
-  Get,
 } from '@nestjs/common';
-import { User } from '@supabase/supabase-js';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { User } from '@supabase/supabase-js';
+
 import { SignInDto, SignInResponseDto } from '../dtos/sign-in.dto';
 import { SignUpDto, SignUpResponseDto } from '../dtos/sign-up.dto';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';

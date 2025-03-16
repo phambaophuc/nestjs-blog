@@ -1,3 +1,4 @@
+import { JwtAuthGuard } from '@modules/auth/guards/jwt-auth.guard';
 import {
   Body,
   Controller,
@@ -16,11 +17,11 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { CommentService } from '../services/comment.service';
+import { Request, Response } from 'express';
+
 import { CommentResponseDto } from '../dtos/comment-response.dto';
 import { CreateCommentDto } from '../dtos/create-comment.dto';
-import { Request, Response } from 'express';
-import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth.guard';
+import { CommentService } from '../services/comment.service';
 
 @ApiTags('CommentController')
 @Controller('comments')

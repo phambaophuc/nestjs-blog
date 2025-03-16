@@ -1,12 +1,13 @@
+import { ArticleService } from '@modules/articles/services/article.service';
 import {
   BadRequestException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CommentRepository } from '../repositories/comment.repository';
-import { CreateCommentDto } from '../dtos/create-comment.dto';
-import { ArticleService } from 'src/modules/articles/services/article.service';
+
 import { CommentResponseDto } from '../dtos/comment-response.dto';
+import { CreateCommentDto } from '../dtos/create-comment.dto';
+import { CommentRepository } from '../repositories/comment.repository';
 
 @Injectable()
 export class CommentService {

@@ -1,6 +1,7 @@
-import { IsNull, Not, Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { IsNull, Not, Repository } from 'typeorm';
+
 import { CreateArticleDto } from '../dtos/create-article.dto';
 import { ArticleEntity } from '../entities/article.entity';
 
@@ -27,6 +28,8 @@ export class ArticleRepository extends Repository<ArticleEntity> {
     if (filter.tag) {
       queryBuilder.where('LOWER(tag.name) = LOWER(:tag)', { tag: filter.tag });
     }
+
+    queryBuilder.orderBy('article.createdAt', 'DESC');
 
     return queryBuilder.getMany();
   }

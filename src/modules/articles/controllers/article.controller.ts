@@ -1,3 +1,4 @@
+import { JwtAuthGuard } from '@modules/auth/guards/jwt-auth.guard';
 import {
   Body,
   Controller,
@@ -17,15 +18,15 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth.guard';
-import { QueryArticleDto } from '../dtos/query-article.dto';
 import { Response } from 'express';
-import { ArticleService } from '../services/article.service';
+
 import {
   ArticleResponseDto,
   GetArticlesResponseDto,
 } from '../dtos/article-response.dto';
 import { CreateArticleDto } from '../dtos/create-article.dto';
+import { QueryArticleDto } from '../dtos/query-article.dto';
+import { ArticleService } from '../services/article.service';
 
 @ApiTags('ArticleController')
 @Controller('articles')

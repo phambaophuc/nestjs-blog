@@ -1,8 +1,9 @@
+import { AuthorResponseDto } from '@modules/authors/dtos/author-response.dto';
+import { CommentResponseDto } from '@modules/comments/dtos/comment-response.dto';
+import { TagResponseDto } from '@modules/tags/dtos/tag-response.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { TagResponseDto } from 'src/modules/tags/dtos/tag-response.dto';
+
 import { ArticleEntity } from '../entities/article.entity';
-import { AuthorResponseDto } from 'src/modules/authors/dtos/author-response.dto';
-import { CommentResponseDto } from 'src/modules/comments/dtos/comment-response.dto';
 
 export class ArticleResponseDto {
   @ApiProperty()

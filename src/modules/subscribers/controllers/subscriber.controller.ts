@@ -1,8 +1,9 @@
 import { Body, Controller, HttpStatus, Post, Res } from '@nestjs/common';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
-import { SubscribersService } from '../services/subscribers.service';
 import { Response } from 'express';
+
 import { SubscribeDto } from '../dtos/subscribe-dto';
+import { SubscribersService } from '../services/subscribers.service';
 
 @ApiTags('SubscriberController')
 @Controller('subscribers')

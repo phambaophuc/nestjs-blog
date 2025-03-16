@@ -1,6 +1,6 @@
+import { ENV } from '@constants/env.constants';
 import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
-import { ENV } from 'src/constants/env.constants';
 
 @Injectable()
 export class EmailService {

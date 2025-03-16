@@ -1,8 +1,8 @@
-import { Entity, Column, ManyToOne, OneToMany } from 'typeorm';
-import { BaseEntity } from '../../../common/entities/base.entity';
-import { TagEntity } from '../../tags/entities/tag.entity';
-import { AuthorEntity } from 'src/modules/authors/entities/author.entity';
-import { CommentEntity } from 'src/modules/comments/entities/comment.entity';
+import { BaseEntity } from '@common/entities/base.entity';
+import { AuthorEntity } from '@modules/authors/entities/author.entity';
+import { CommentEntity } from '@modules/comments/entities/comment.entity';
+import { TagEntity } from '@modules/tags/entities/tag.entity';
+import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 
 @Entity('articles')
 export class ArticleEntity extends BaseEntity {
@@ -26,6 +26,8 @@ export class ArticleEntity extends BaseEntity {
   })
   author: AuthorEntity;
 
-  @OneToMany(() => CommentEntity, (comment) => comment.article, { cascade: true })
+  @OneToMany(() => CommentEntity, (comment) => comment.article, {
+    cascade: true,
+  })
   comments: CommentEntity[];
 }

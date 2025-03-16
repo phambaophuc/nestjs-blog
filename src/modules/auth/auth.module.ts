@@ -1,8 +1,9 @@
+import { AuthorModule } from '@modules/authors/author.module';
 import { Module } from '@nestjs/common';
-import { AuthService } from './services/auth.service';
-import { AuthorModule } from '../authors/author.module';
-import { SupabaseModule } from 'src/utils/supabase/supabase.module';
+import { SupabaseModule } from '@utils/supabase/supabase.module';
+
 import { AuthController } from './controllers/auth.controller';
+import { AuthService } from './services/auth.service';
 
 @Module({
   imports: [AuthorModule, SupabaseModule],

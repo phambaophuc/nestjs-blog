@@ -1,7 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { SubscriberRepository } from '../repositories/subscribers.repository';
-import { EmailService } from 'src/utils/nodemailer/email.service';
+import { EmailService } from '@utils/nodemailer/email.service';
+
 import { SubscriberResponseDto } from '../dtos/subscriber-response.dto';
+import { SubscriberRepository } from '../repositories/subscribers.repository';
 
 @Injectable()
 export class SubscribersService {

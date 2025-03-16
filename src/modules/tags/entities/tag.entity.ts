@@ -1,6 +1,6 @@
-import { Entity, Column, OneToMany } from 'typeorm';
-import { BaseEntity } from '../../../common/entities/base.entity';
-import { ArticleEntity } from 'src/modules/articles/entities/article.entity';
+import { BaseEntity } from '@common/entities/base.entity';
+import { ArticleEntity } from '@modules/articles/entities/article.entity';
+import { Column, Entity, OneToMany } from 'typeorm';
 
 @Entity('tags')
 export class TagEntity extends BaseEntity {
