@@ -18,6 +18,9 @@ export class ArticleEntity extends BaseEntity {
   @Column({ nullable: true })
   imageUrl: string;
 
+  @Column({ default: 0 })
+  views: number;
+
   @ManyToOne(() => TagEntity, (tag) => tag.articles, { onDelete: 'CASCADE' })
   tag: TagEntity;
 

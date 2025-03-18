@@ -87,4 +87,8 @@ export class ArticleRepository extends Repository<ArticleEntity> {
   public async destroy(id: string): Promise<void> {
     await this.delete(id);
   }
+
+  public async incrementArticleViews(id: string): Promise<void> {
+    await this.increment({ id }, 'views', 1);
+  }
 }

@@ -22,6 +22,9 @@ export class ArticleResponseDto {
   imageUrl: string;
 
   @ApiProperty()
+  views: number;
+
+  @ApiProperty()
   createdAt: Date;
 
   @ApiProperty()
@@ -43,6 +46,7 @@ export class ArticleResponseDto {
       description: article.description,
       content: article.content,
       imageUrl: article.imageUrl,
+      views: article.views,
       createdAt: article.createdAt,
       updatedAt: article.updatedAt,
       author: AuthorResponseDto.fromEntity(article.author),

@@ -45,6 +45,7 @@ export class ArticleService {
 
   async findById(id: string): Promise<ArticleResponseDto> {
     try {
+      await this.articleRepo.incrementArticleViews(id);
       const article = await this.articleRepo.findById(id);
       if (!article) {
         throw new NotFoundException('Article not found.');
