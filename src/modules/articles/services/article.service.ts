@@ -5,6 +5,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { GeminiService } from '@utils/gemini/gemini.service';
 import { EmailService } from '@utils/nodemailer/email.service';
 
 import {
@@ -21,6 +22,7 @@ export class ArticleService {
     private readonly articleRepo: ArticleRepository,
     private readonly subscriberService: SubscribersService,
     private readonly emailService: EmailService,
+    private readonly geminiService: GeminiService,
   ) {}
 
   async findAll(query: QueryArticleDto): Promise<GetArticlesResponseDto> {
@@ -72,7 +74,11 @@ export class ArticleService {
     createArticleDto: CreateArticleDto,
   ): Promise<ArticleResponseDto> {
     try {
-      const article = await this.articleRepo.store(createArticleDto);
+      const { content } = createArticleDto;
+      const article = await this.articleRepo.store({
+        ...createArticleDto,
+        description: await this.geminiService.summarize(content),
+      });
 
       const subscribers = await this.subscriberService.findAll();
 

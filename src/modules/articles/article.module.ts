@@ -2,6 +2,7 @@ import { AuthModule } from '@modules/auth/auth.module';
 import { SubscriberModule } from '@modules/subscribers/subscriber.module';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { GeminiModule } from '@utils/gemini/gemini.module';
 import { EmailModule } from '@utils/nodemailer/email.module';
 
 import { ArticleController } from './controllers/article.controller';
@@ -15,6 +16,7 @@ import { ArticleService } from './services/article.service';
     AuthModule,
     SubscriberModule,
     EmailModule,
+    GeminiModule,
   ],
   providers: [ArticleRepository, ArticleService],
   controllers: [ArticleController],
