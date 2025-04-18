@@ -22,7 +22,7 @@ export class ArticleRepository extends Repository<ArticleEntity> {
     tag?: string;
   }): Promise<ArticleEntity[]> {
     const queryBuilder = this.createQueryBuilder('article')
-      .leftJoinAndSelect('article.author', 'author')
+      .leftJoinAndSelect('article.user', 'user')
       .leftJoinAndSelect('article.tag', 'tag');
 
     if (filter.tag) {
@@ -50,7 +50,7 @@ export class ArticleRepository extends Repository<ArticleEntity> {
         tag: { id: currentArticle.tag.id },
         id: Not(id),
       },
-      relations: { author: true, tag: true },
+      relations: { user: true, tag: true },
       take: limit ?? 5,
     });
 
@@ -60,7 +60,7 @@ export class ArticleRepository extends Repository<ArticleEntity> {
   public async findByTagId(id: string): Promise<ArticleEntity[]> {
     return this.find({
       where: { tag: { id } },
-      relations: { tag: true, author: true },
+      relations: { tag: true, user: true },
     });
   }
 
@@ -68,9 +68,9 @@ export class ArticleRepository extends Repository<ArticleEntity> {
     return this.findOne({
       where: { id, comments: { parent: IsNull() } },
       relations: {
-        author: true,
+        user: true,
         tag: true,
-        comments: { author: true, replies: { author: true } },
+        comments: { user: true, replies: { user: true } },
       },
     });
   }
@@ -79,7 +79,7 @@ export class ArticleRepository extends Repository<ArticleEntity> {
     const newArticle = this.create({
       ...article,
       tag: { id: article.tagId },
-      author: { id: article.authorId },
+      user: { id: article.userId },
     });
     return this.save(newArticle);
   }

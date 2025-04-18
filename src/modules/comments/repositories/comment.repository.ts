@@ -17,7 +17,7 @@ export class CommentRepository extends Repository<CommentEntity> {
   public async findAll(): Promise<CommentEntity[]> {
     return this.find({
       where: { parent: IsNull() },
-      relations: { author: true, replies: { author: true } },
+      relations: { user: true, replies: { user: true } },
       order: { createdAt: 'DESC' },
     });
   }
@@ -25,7 +25,7 @@ export class CommentRepository extends Repository<CommentEntity> {
   public async findById(id: string): Promise<CommentEntity | null> {
     return this.findOne({
       where: { id },
-      relations: { author: true, replies: { author: true } },
+      relations: { user: true, replies: { user: true } },
     });
   }
 
@@ -33,7 +33,7 @@ export class CommentRepository extends Repository<CommentEntity> {
     const newComment = this.create({
       ...comment,
       article: { id: comment.articleId },
-      author: { id: comment.authorId },
+      user: { id: comment.userId },
       parent: { id: comment.parentId },
     });
     return this.save(newComment);

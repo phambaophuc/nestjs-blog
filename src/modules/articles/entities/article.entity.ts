@@ -1,7 +1,7 @@
 import { BaseEntity } from '@common/entities/base.entity';
-import { AuthorEntity } from '@modules/authors/entities/author.entity';
 import { CommentEntity } from '@modules/comments/entities/comment.entity';
 import { TagEntity } from '@modules/tags/entities/tag.entity';
+import { UserEntity } from '@modules/users/entities/user.entity';
 import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 
 @Entity('articles')
@@ -24,10 +24,10 @@ export class ArticleEntity extends BaseEntity {
   @ManyToOne(() => TagEntity, (tag) => tag.articles, { onDelete: 'CASCADE' })
   tag: TagEntity;
 
-  @ManyToOne(() => AuthorEntity, (author) => author.articles, {
+  @ManyToOne(() => UserEntity, (user) => user.articles, {
     onDelete: 'CASCADE',
   })
-  author: AuthorEntity;
+  user: UserEntity;
 
   @OneToMany(() => CommentEntity, (comment) => comment.article, {
     cascade: true,

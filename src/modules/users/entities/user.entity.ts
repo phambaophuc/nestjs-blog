@@ -1,9 +1,10 @@
 import { ArticleEntity } from '@modules/articles/entities/article.entity';
 import { CommentEntity } from '@modules/comments/entities/comment.entity';
+import { NotificationEntity } from '@modules/notifications/entities/notification.entity';
 import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
 
-@Entity('authors')
-export class AuthorEntity {
+@Entity('users')
+export class UserEntity {
   @PrimaryColumn('uuid')
   id: string;
 
@@ -16,9 +17,12 @@ export class AuthorEntity {
   @Column({ nullable: true })
   avatarUrl?: string;
 
-  @OneToMany(() => ArticleEntity, (article) => article.author)
+  @OneToMany(() => ArticleEntity, (article) => article.user)
   articles: ArticleEntity[];
 
-  @OneToMany(() => CommentEntity, (comment) => comment.author)
+  @OneToMany(() => CommentEntity, (comment) => comment.user)
   comments: CommentEntity[];
+
+  @OneToMany(() => NotificationEntity, (notification) => notification.user)
+  notifications: NotificationEntity[];
 }

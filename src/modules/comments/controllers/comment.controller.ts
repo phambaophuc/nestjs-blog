@@ -50,7 +50,7 @@ export class CommentController {
   ): Promise<CommentResponseDto> {
     return this.commentService.create({
       ...comment,
-      authorId: req['user'].id,
+      userId: req['user'].id,
     });
   }
 

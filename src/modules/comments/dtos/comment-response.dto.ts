@@ -1,4 +1,4 @@
-import { AuthorResponseDto } from '@modules/authors/dtos/author-response.dto';
+import { UserResponseDto } from '@modules/users/dtos/user-response.dto';
 import { ApiProperty } from '@nestjs/swagger';
 
 import { CommentEntity } from '../entities/comment.entity';
@@ -13,8 +13,8 @@ export class CommentResponseDto {
   @ApiProperty()
   createdAt: Date;
 
-  @ApiProperty({ type: () => AuthorResponseDto })
-  author: AuthorResponseDto;
+  @ApiProperty({ type: () => UserResponseDto })
+  user: UserResponseDto;
 
   @ApiProperty({ type: () => [CommentResponseDto], nullable: true })
   replies?: CommentResponseDto[];
@@ -24,7 +24,7 @@ export class CommentResponseDto {
       id: comment.id,
       content: comment.content,
       createdAt: comment.createdAt,
-      author: AuthorResponseDto.fromEntity(comment.author),
+      user: UserResponseDto.fromEntity(comment.user),
       replies: comment.replies ?? [],
     };
   }

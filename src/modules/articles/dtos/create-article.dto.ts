@@ -21,5 +21,5 @@ export class CreateArticleDto {
   @IsNotEmpty()
   tagId: string;
 
-  authorId: string;
+  userId: string;
 }

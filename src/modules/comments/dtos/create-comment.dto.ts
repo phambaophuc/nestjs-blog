@@ -15,5 +15,5 @@ export class CreateCommentDto {
   @IsOptional()
   parentId?: string;
 
-  authorId: string;
+  userId: string;
 }

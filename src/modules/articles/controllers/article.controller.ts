@@ -63,7 +63,7 @@ export class ArticleController {
   ): Promise<ArticleResponseDto> {
     return this.articleService.create({
       ...createArticleDto,
-      authorId: req['user'].id,
+      userId: req['user'].id,
     });
   }
 

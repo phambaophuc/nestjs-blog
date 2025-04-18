@@ -1,6 +1,6 @@
 import { BaseEntity } from '@common/entities/base.entity';
 import { ArticleEntity } from '@modules/articles/entities/article.entity';
-import { AuthorEntity } from '@modules/authors/entities/author.entity';
+import { UserEntity } from '@modules/users/entities/user.entity';
 import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 
 @Entity('comments')
@@ -13,10 +13,10 @@ export class CommentEntity extends BaseEntity {
   })
   article: ArticleEntity;
 
-  @ManyToOne(() => AuthorEntity, (author) => author.comments, {
+  @ManyToOne(() => UserEntity, (user) => user.comments, {
     onDelete: 'CASCADE',
   })
-  author: AuthorEntity;
+  user: UserEntity;
 
   @ManyToOne(() => CommentEntity, (comment) => comment.replies, {
     nullable: true,

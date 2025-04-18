@@ -1,4 +1,4 @@
-import { AuthorService } from '@modules/authors/services/author.service';
+import { UserService } from '@modules/users/services/user.service';
 import {
   BadRequestException,
   Injectable,
@@ -13,7 +13,7 @@ import { SignUpDto, SignUpResponseDto } from '../dtos/sign-up.dto';
 export class AuthService {
   constructor(
     private readonly supabaseService: SupabaseService,
-    private readonly authorService: AuthorService,
+    private readonly userService: UserService,
   ) {}
 
   async signUp(signUpDto: SignUpDto): Promise<SignUpResponseDto> {
@@ -24,7 +24,7 @@ export class AuthService {
       throw new BadRequestException('User registration failed');
     }
 
-    await this.authorService.create({
+    await this.userService.create({
       id: data.user.id,
       displayName,
       email,
