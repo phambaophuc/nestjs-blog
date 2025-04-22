@@ -1,5 +1,5 @@
-import { ENV } from '@constants/env.constants';
 import { ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
@@ -7,6 +7,9 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
+
+  const configService = app.get(ConfigService);
+  const appPort = configService.get<number>('app.port') || 3000;
 
   app.useGlobalPipes(new ValidationPipe());
 
@@ -20,6 +23,6 @@ async function bootstrap() {
   SwaggerModule.setup('swagger', app, documentFactory);
 
   app.setGlobalPrefix('api');
-  await app.listen(ENV.APP_PORT ?? 3000);
+  await app.listen(appPort);
 }
 bootstrap();

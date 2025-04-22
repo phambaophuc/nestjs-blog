@@ -1,12 +1,12 @@
-import { ArticleModule } from '@modules/articles/article.module';
-import { AuthModule } from '@modules/auth/auth.module';
+import { AuthModule } from '@auth';
+import { CommentEntity } from '@entities';
+import { ArticleModule } from '@modules/articles';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { CommentController } from './controllers/comment.controller';
-import { CommentEntity } from './entities/comment.entity';
-import { CommentRepository } from './repositories/comment.repository';
-import { CommentService } from './services/comment.service';
+import { CommentController } from './comment.controller';
+import { CommentRepository } from './comment.repository';
+import { CommentService } from './comment.service';
 
 @Module({
   imports: [

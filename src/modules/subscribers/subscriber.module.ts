@@ -1,11 +1,11 @@
+import { SubscriberEntity } from '@entities';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { EmailModule } from '@utils/nodemailer/email.module';
+import { EmailModule } from '@shared';
 
-import { SubscriberController } from './controllers/subscriber.controller';
-import { SubscriberEntity } from './entities/subscriber.entity';
-import { SubscriberRepository } from './repositories/subscribers.repository';
-import { SubscribersService } from './services/subscribers.service';
+import { SubscriberController } from './subscriber.controller';
+import { SubscriberRepository } from './subscribers.repository';
+import { SubscribersService } from './subscribers.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([SubscriberEntity]), EmailModule],

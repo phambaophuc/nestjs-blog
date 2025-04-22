@@ -1,21 +1,20 @@
-import { AuthModule } from '@modules/auth/auth.module';
-import { SubscriberModule } from '@modules/subscribers/subscriber.module';
+import { AuthModule } from '@auth';
+import { ArticleEntity } from '@entities';
+import { SubscriberModule } from '@modules/subscribers';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { GeminiModule } from '@utils/gemini/gemini.module';
-import { EmailModule } from '@utils/nodemailer/email.module';
+import { GeminiModule, HtmlUtilsModule } from '@shared';
 
-import { ArticleController } from './controllers/article.controller';
-import { ArticleEntity } from './entities/article.entity';
-import { ArticleRepository } from './repositories/article.repository';
-import { ArticleService } from './services/article.service';
+import { ArticleController } from './article.controller';
+import { ArticleRepository } from './article.repository';
+import { ArticleService } from './article.service';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([ArticleEntity]),
     AuthModule,
     SubscriberModule,
-    EmailModule,
+    HtmlUtilsModule,
     GeminiModule,
   ],
   providers: [ArticleRepository, ArticleService],
