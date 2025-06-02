@@ -15,7 +15,7 @@ export class SignInDto {
 
 export class SignInResponseDto {
   @ApiProperty()
-  token: string;
+  accessToken: string;
 }
 
 export class SignUpDto {

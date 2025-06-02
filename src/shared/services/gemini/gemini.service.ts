@@ -4,6 +4,8 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import LanguageDetect from 'languagedetect';
 
+const MAX_INPUT_LENGTH = 4000;
+
 @Injectable()
 export class GeminiService {
   private readonly genAI: GoogleGenerativeAI;
@@ -25,16 +27,19 @@ export class GeminiService {
 
   async summarize(text: string): Promise<string> {
     try {
-      if (!text?.trim()) {
+      const cleanedText = text?.trim();
+      if (!cleanedText) {
         throw new Error('Input text cannot be empty');
       }
 
+      const inputText = cleanedText.slice(0, MAX_INPUT_LENGTH);
       const language = this.detectLanguage(text);
+
       const prompt = `
         Summarize the following text in about 20 to 30 words in ${language}, keeping it abstract and conceptual.
         Focus on strategic vision and fundamental principles rather than specific details or examples.
 
-        Text: """${text}"""
+        Text: """${inputText}"""
 
         Return only the summary.
       `;
