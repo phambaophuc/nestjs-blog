@@ -1,94 +1,129 @@
-import { ArticleEntity } from '@entities';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ArticleEntity } from 'entities';
 import { IsNull, Not, Repository } from 'typeorm';
 
-import { CreateArticleDto } from './dto';
+export interface ArticleFilters {
+  tag?: string;
+  userId?: string;
+  isPublished?: boolean;
+}
+
+export interface PaginationOptions {
+  page: number;
+  limit: number;
+}
+
+export interface ArticleWithPagination {
+  data: ArticleEntity[];
+  total: number;
+}
 
 @Injectable()
-export class ArticleRepository extends Repository<ArticleEntity> {
+export class ArticleRepository {
   constructor(
     @InjectRepository(ArticleEntity)
-    private articleRepository: Repository<ArticleEntity>,
-  ) {
-    super(
-      articleRepository.target,
-      articleRepository.manager,
-      articleRepository.queryRunner,
-    );
-  }
+    private repository: Repository<ArticleEntity>,
+  ) {}
 
-  public async findWithFilters(filter: {
-    tag?: string;
-  }): Promise<ArticleEntity[]> {
-    const queryBuilder = this.createQueryBuilder('article')
+  async findWithFiltersAndPagination(
+    filters: ArticleFilters,
+    pagination: PaginationOptions,
+  ): Promise<ArticleWithPagination> {
+    const queryBuilder = this.repository
+      .createQueryBuilder('article')
       .leftJoinAndSelect('article.user', 'user')
       .leftJoinAndSelect('article.tag', 'tag');
 
-    if (filter.tag) {
-      queryBuilder.where('LOWER(tag.name) = LOWER(:tag)', { tag: filter.tag });
+    if (filters.tag) {
+      queryBuilder.andWhere('LOWER(tag.name) = LOWER(:tag)', {
+        tag: filters.tag,
+      });
     }
 
-    queryBuilder.orderBy('article.createdAt', 'DESC');
+    if (filters.userId) {
+      queryBuilder.andWhere('article.userId = :userId', {
+        userId: filters.userId,
+      });
+    }
 
-    return queryBuilder.getMany();
+    if (filters.isPublished !== undefined) {
+      queryBuilder.andWhere('article.isPublished = :isPublished', {
+        isPublished: filters.isPublished,
+      });
+    }
+
+    const { page, limit } = pagination;
+    const skip = (page - 1) * limit;
+
+    queryBuilder.orderBy('article.createdAt', 'DESC').skip(skip).take(limit);
+
+    const [data, total] = await queryBuilder.getManyAndCount();
+
+    return { data, total };
   }
 
-  public async findAllRelated(
-    id: string,
-    limit?: number,
+  async findAllRelated(
+    articleId: string,
+    limit: number = 5,
   ): Promise<ArticleEntity[]> {
-    const currentArticle = await this.findOne({
-      where: { id },
+    const currentArticle = await this.repository.findOne({
+      where: { id: articleId },
       relations: { tag: true },
     });
 
-    if (!currentArticle) return [];
+    if (!currentArticle?.tag) {
+      return [];
+    }
 
-    const relatedArticles = await this.find({
+    return this.repository.find({
       where: {
         tag: { id: currentArticle.tag.id },
-        id: Not(id),
+        id: Not(articleId),
       },
       relations: { user: true, tag: true },
-      take: limit ?? 5,
+      order: { createdAt: 'DESC' },
+      take: limit,
     });
-
-    return relatedArticles;
   }
 
-  public async findByTagId(id: string): Promise<ArticleEntity[]> {
-    return this.find({
-      where: { tag: { id } },
+  async findByTagId(tagId: string): Promise<ArticleEntity[]> {
+    return this.repository.find({
+      where: {
+        tag: { id: tagId },
+      },
       relations: { tag: true, user: true },
+      order: { createdAt: 'DESC' },
     });
   }
 
-  public async findById(id: string): Promise<ArticleEntity | null> {
-    return this.findOne({
-      where: { id, comments: { parent: IsNull() } },
+  async findById(id: string): Promise<ArticleEntity | null> {
+    return this.repository.findOne({
+      where: {
+        id,
+        comments: { parent: IsNull() },
+      },
       relations: {
         user: true,
         tag: true,
-        comments: { user: true, replies: { user: true } },
+        comments: {
+          user: true,
+          replies: { user: true },
+        },
       },
     });
   }
 
-  public async store(article: CreateArticleDto): Promise<ArticleEntity> {
-    const newArticle = this.create({
-      ...article,
-      tag: { id: article.tagId },
-      user: { id: article.userId },
-    });
-    return this.save(newArticle);
+  async store(articleData: Partial<ArticleEntity>): Promise<ArticleEntity> {
+    const article = this.repository.create(articleData);
+    return this.repository.save(article);
   }
 
   public async destroy(id: string): Promise<void> {
-    await this.delete(id);
+    await this.repository.delete(id);
   }
 
-  public async incrementArticleViews(id: string): Promise<void> {
-    await this.increment({ id }, 'views', 1);
+  async incrementViews(id: string): Promise<void> {
+    await this.repository.increment({ id }, 'views', 1);
   }
 }

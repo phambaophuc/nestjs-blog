@@ -1,13 +1,11 @@
-import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
+import { Column, Entity, OneToMany } from 'typeorm';
 
 import { ArticleEntity } from './article.entity';
+import { BaseEntity } from './base.entity';
 import { CommentEntity } from './comment.entity';
 
 @Entity('users')
-export class UserEntity {
-  @PrimaryColumn('uuid')
-  id: string;
-
+export class UserEntity extends BaseEntity {
   @Column({ nullable: false, unique: true })
   email: string;
 
@@ -16,6 +14,9 @@ export class UserEntity {
 
   @Column({ nullable: true })
   avatarUrl?: string;
+
+  @Column({ nullable: false })
+  password: string;
 
   @OneToMany(() => ArticleEntity, (article) => article.user)
   articles: ArticleEntity[];

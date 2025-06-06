@@ -1,37 +1,39 @@
-import { UserEntity } from '@entities';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { UserEntity } from 'entities';
 import { Repository } from 'typeorm';
 
-import { CreateUserDto } from './dto';
-
 @Injectable()
-export class UserRepository extends Repository<UserEntity> {
+export class UserRepository {
   constructor(
     @InjectRepository(UserEntity)
-    private userRepo: Repository<UserEntity>,
-  ) {
-    super(userRepo.target, userRepo.manager, userRepo.queryRunner);
+    private repository: Repository<UserEntity>,
+  ) {}
+
+  async findAll(): Promise<UserEntity[]> {
+    return this.repository.find({ relations: { articles: true } });
   }
 
-  public async findAll(): Promise<UserEntity[]> {
-    return this.find({ relations: { articles: true } });
+  async findById(id: string): Promise<UserEntity | null> {
+    return this.repository.findOne({
+      where: { id },
+      relations: { articles: true },
+    });
   }
 
-  public async findById(id: string): Promise<UserEntity | null> {
-    return this.findOne({ where: { id }, relations: { articles: true } });
+  async findByEmail(email: string): Promise<UserEntity | null> {
+    return this.repository.findOne({
+      where: { email },
+      relations: { articles: true },
+    });
   }
 
-  public async findByEmail(email: string): Promise<UserEntity | null> {
-    return this.findOne({ where: { email }, relations: { articles: true } });
+  async store(userData: Partial<UserEntity>): Promise<UserEntity> {
+    const user = this.repository.create(userData);
+    return this.repository.save(user);
   }
 
-  public async store(user: CreateUserDto): Promise<UserEntity> {
-    const newUser = this.create(user);
-    return this.save(newUser);
-  }
-
-  public async destroy(id: string): Promise<void> {
-    await this.delete(id);
+  async destroy(id: string): Promise<void> {
+    await this.repository.delete(id);
   }
 }

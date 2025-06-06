@@ -1,6 +1,6 @@
-import { CommentEntity } from '@entities';
-import { UserResponseDto } from '@modules/users/dto/response.dto';
+import { UserResponseDto } from '@modules/users/dto/user.dto';
 import { ApiProperty } from '@nestjs/swagger';
+import { CommentEntity } from 'entities';
 
 export class CommentResponseDto {
   @ApiProperty()

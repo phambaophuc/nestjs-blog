@@ -1,6 +1,6 @@
-import { SubscriberEntity } from '@entities';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { SubscriberEntity } from 'entities';
 import { Repository } from 'typeorm';
 
 import { CreateSubscriberDto } from './dto';

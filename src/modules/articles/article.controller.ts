@@ -5,20 +5,22 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   HttpStatus,
   Param,
+  ParseUUIDPipe,
   Post,
   Query,
-  Res,
   UseGuards,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOkResponse,
+  ApiParam,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { Response } from 'express';
 
 import { ArticleService } from './article.service';
 import {
@@ -34,7 +36,13 @@ export class ArticleController {
   constructor(private readonly articleService: ArticleService) {}
 
   @Get()
-  @ApiOkResponse({ type: GetArticlesResponseDto })
+  @ApiOkResponse({
+    description: 'Successfully retrieved articles',
+    type: GetArticlesResponseDto,
+  })
+  @ApiQuery({ name: 'tag', required: false, description: 'Filter by tag' })
+  @ApiQuery({ name: 'page', required: false, description: 'Page number' })
+  @ApiQuery({ name: 'limit', required: false, description: 'Items per page' })
   public async findAll(
     @Query() query: QueryArticleDto,
   ): Promise<GetArticlesResponseDto> {
@@ -42,21 +50,36 @@ export class ArticleController {
   }
 
   @Get(':id')
-  @ApiOkResponse({ type: ArticleResponseDto })
-  public async findById(@Param('id') id: string): Promise<ArticleResponseDto> {
+  @ApiOkResponse({
+    description: 'Successfully retrieved article',
+    type: ArticleResponseDto,
+  })
+  @ApiParam({ name: 'id', description: 'Article ID' })
+  public async findById(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<ArticleResponseDto> {
     return this.articleService.findById(id);
   }
 
   @Get(':id/related')
-  @ApiOkResponse({ type: [ArticleResponseDto] })
-  public async findRelatedArticles(@Param('id') id: string) {
+  @ApiOkResponse({
+    description: 'Successfully retrieved related articles',
+    type: [ArticleResponseDto],
+  })
+  @ApiParam({ name: 'id', description: 'Article ID' })
+  public async findRelatedArticles(@Param('id', ParseUUIDPipe) id: string) {
     return this.articleService.findAllRelated(id);
   }
 
   @Post()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiResponse({ status: 201, type: ArticleResponseDto })
+  @HttpCode(HttpStatus.CREATED)
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Article created successfully',
+    type: ArticleResponseDto,
+  })
   public async create(
     @Body() createArticleDto: CreateArticleDto,
     @User() user: any,
@@ -68,10 +91,15 @@ export class ArticleController {
   }
 
   @Delete(':id')
-  public async delete(@Res() response: Response, @Param('id') id: string) {
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiResponse({
+    status: HttpStatus.NO_CONTENT,
+    description: 'Article deleted successfully',
+  })
+  @ApiParam({ name: 'id', description: 'Article ID' })
+  public async delete(@Param('id', ParseUUIDPipe) id: string) {
     await this.articleService.delete(id);
-    return response.status(HttpStatus.OK).json({
-      message: 'Article has been deleted successfully',
-    });
   }
 }

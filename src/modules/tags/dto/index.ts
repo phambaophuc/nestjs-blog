@@ -1,2 +1,2 @@
-export * from './create-tag.dto';
-export * from './response.dto';
+export * from './create.dto';
+export * from './tag.dto';

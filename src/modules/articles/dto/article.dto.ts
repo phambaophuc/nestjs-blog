@@ -1,9 +1,9 @@
 import { PaginatedResponseDto } from '@common/dto';
-import { ArticleEntity } from '@entities';
-import { CommentResponseDto } from '@modules/comments/dto/response.dto';
-import { TagResponseDto } from '@modules/tags/dto/response.dto';
-import { UserResponseDto } from '@modules/users/dto/response.dto';
+import { CommentResponseDto } from '@modules/comments/dto/comment.dto';
+import { TagResponseDto } from '@modules/tags/dto/tag.dto';
+import { UserResponseDto } from '@modules/users/dto/user.dto';
 import { ApiProperty } from '@nestjs/swagger';
+import { ArticleEntity } from 'entities';
 
 export class ArticleResponseDto {
   @ApiProperty()

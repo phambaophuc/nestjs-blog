@@ -1,14 +1,26 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty } from 'class-validator';
 
-export class CreateSubscriberDto {
+import { SubscriberEntity } from '../../../entities/subscriber.entity';
+
+export class SubscriberResponseDto {
   @ApiProperty()
-  @IsNotEmpty()
-  @IsEmail()
-  email: string;
-}
+  id: string;
 
-export class SubscribeDto {
   @ApiProperty()
   email: string;
+
+  static fromEntity(subscriber: SubscriberEntity): SubscriberResponseDto {
+    return {
+      id: subscriber.id,
+      email: subscriber.email,
+    };
+  }
+
+  static fromEntities(
+    subscribers: SubscriberEntity[],
+  ): SubscriberResponseDto[] {
+    return subscribers.map((subscriber) =>
+      SubscriberResponseDto.fromEntity(subscriber),
+    );
+  }
 }
