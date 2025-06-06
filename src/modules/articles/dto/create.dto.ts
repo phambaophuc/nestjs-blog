@@ -14,8 +14,4 @@ export class CreateArticleDto {
   @IsUUID()
   @IsNotEmpty()
   tagId: string;
-
-  imageUrl: string;
-  description: string;
-  userId: string;
 }

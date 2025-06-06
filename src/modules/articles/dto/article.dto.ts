@@ -31,10 +31,10 @@ export class ArticleResponseDto {
   updatedAt: Date;
 
   @ApiProperty({ type: () => UserResponseDto })
-  user: UserResponseDto;
+  user?: UserResponseDto;
 
   @ApiProperty({ type: () => TagResponseDto })
-  tag: TagResponseDto;
+  tag?: TagResponseDto;
 
   @ApiProperty({ type: () => [CommentResponseDto], nullable: true })
   comments?: CommentResponseDto[];
@@ -49,8 +49,8 @@ export class ArticleResponseDto {
       views: article.views,
       createdAt: article.createdAt,
       updatedAt: article.updatedAt,
-      user: UserResponseDto.fromEntity(article.user),
-      tag: TagResponseDto.fromEntity(article.tag),
+      user: article.user ? UserResponseDto.fromEntity(article.user) : undefined,
+      tag: article.tag ? TagResponseDto.fromEntity(article.tag) : undefined,
       comments: article.comments
         ? CommentResponseDto.fromEntities(article.comments)
         : [],

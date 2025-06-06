@@ -14,12 +14,16 @@ export class UserResponseDto {
   @ApiProperty({ example: 'https://example.com/avatar.jpg', nullable: true })
   avatarUrl?: string;
 
-  static fromEntity(user: UserEntity): UserResponseDto {
+  @ApiProperty()
+  refreshToken: string | null;
+
+  static fromEntity(user: UserEntity | UserInternalDto): UserResponseDto {
     return {
       id: user.id,
       displayName: user.displayName,
       email: user.email,
       avatarUrl: user.avatarUrl,
+      refreshToken: user.refreshToken,
     };
   }
 
@@ -34,6 +38,7 @@ export class UserInternalDto {
   displayName: string;
   avatarUrl?: string;
   password: string;
+  refreshToken: string | null;
 
   static fromEntity(user: UserEntity): UserInternalDto {
     return {
@@ -42,6 +47,7 @@ export class UserInternalDto {
       email: user.email,
       avatarUrl: user.avatarUrl,
       password: user.password,
+      refreshToken: user.refreshToken,
     };
   }
 }

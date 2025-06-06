@@ -34,14 +34,14 @@ export class JwtAuthGuard implements CanActivate {
       const request = context.switchToHttp().getRequest<Request>();
 
       // Check if route is marked as public
-      const isPublic = this.reflector.getAllAndOverride<boolean>('isPublic', [
-        context.getHandler(),
-        context.getClass(),
-      ]);
+      // const isPublic = this.reflector.getAllAndOverride<boolean>('isPublic', [
+      //   context.getHandler(),
+      //   context.getClass(),
+      // ]);
 
-      if (isPublic) {
-        return true;
-      }
+      // if (isPublic) {
+      //   return true;
+      // }
 
       const token = this.extractTokenFromHeader(request);
 

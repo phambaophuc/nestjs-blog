@@ -1,7 +1,16 @@
 import { User as UserDecorator } from '@common';
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { UserResponseDto } from '@modules/users/dto';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { User } from '@supabase/supabase-js';
+import { Request, Response } from 'express';
 
 import { AuthService } from './auth.service';
 import {
@@ -27,14 +36,34 @@ export class AuthController {
   @Post('signin')
   public async signIn(
     @Body() signInDto: SignInDto,
+    @Res({ passthrough: true }) res: Response,
   ): Promise<SignInResponseDto> {
-    return this.authService.signIn(signInDto);
+    return this.authService.signIn(signInDto, res);
+  }
+
+  @Post('refresh')
+  public async refreshToken(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<{ accessToken: string }> {
+    return this.authService.refreshTokens(req, res);
+  }
+
+  @Post('signout')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  public async logout(
+    @UserDecorator() user: UserResponseDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    await this.authService.signOut(user.id, res);
+    return { message: 'Logout successful' };
   }
 
   @Get('users/me')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  public getUser(@UserDecorator() user: User) {
+  public getUser(@UserDecorator() user: UserResponseDto) {
     return user;
   }
 }

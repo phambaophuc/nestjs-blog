@@ -1,5 +1,6 @@
 import { JwtAuthGuard } from '@auth';
 import { User } from '@common/decorators';
+import { UserResponseDto } from '@modules/users/dto';
 import {
   Body,
   Controller,
@@ -82,12 +83,9 @@ export class ArticleController {
   })
   public async create(
     @Body() createArticleDto: CreateArticleDto,
-    @User() user: any,
+    @User() user: UserResponseDto,
   ): Promise<ArticleResponseDto> {
-    return this.articleService.create({
-      ...createArticleDto,
-      userId: user.id,
-    });
+    return this.articleService.create(createArticleDto, user.id);
   }
 
   @Delete(':id')

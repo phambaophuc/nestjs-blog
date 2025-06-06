@@ -32,11 +32,11 @@ export class UserService {
     }
   }
 
-  async findByEmail(email: string): Promise<UserResponseDto> {
+  async findByEmail(email: string): Promise<UserResponseDto | null> {
     try {
       const user = await this.userRepository.findByEmail(email);
       if (!user) {
-        throw new NotFoundException('User not found.');
+        return null;
       }
       return UserResponseDto.fromEntity(user);
     } catch (error) {
@@ -59,6 +59,13 @@ export class UserService {
     } catch (error) {
       throw new BadRequestException(error.message);
     }
+  }
+
+  async updateRefreshToken(
+    id: string,
+    refreshToken: string | null,
+  ): Promise<void> {
+    await this.userRepository.update(id, { refreshToken });
   }
 
   async delete(id: string): Promise<void> {

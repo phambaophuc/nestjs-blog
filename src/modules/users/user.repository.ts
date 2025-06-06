@@ -33,6 +33,14 @@ export class UserRepository {
     return this.repository.save(user);
   }
 
+  async update(
+    id: string,
+    data: Partial<UserEntity>,
+  ): Promise<UserEntity | null> {
+    await this.repository.update(id, data);
+    return this.findById(id);
+  }
+
   async destroy(id: string): Promise<void> {
     await this.repository.delete(id);
   }

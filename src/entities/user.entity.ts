@@ -18,6 +18,9 @@ export class UserEntity extends BaseEntity {
   @Column({ nullable: false })
   password: string;
 
+  @Column({ type: 'text', nullable: true })
+  refreshToken: string | null;
+
   @OneToMany(() => ArticleEntity, (article) => article.user)
   articles: ArticleEntity[];
 

@@ -103,6 +103,7 @@ export class ArticleService {
 
   async create(
     createArticleDto: CreateArticleDto,
+    userId: string,
   ): Promise<ArticleResponseDto> {
     try {
       const { content, title } = createArticleDto;
@@ -124,6 +125,7 @@ export class ArticleService {
         ...createArticleDto,
         description,
         imageUrl: imageUrl ?? undefined,
+        userId,
       };
 
       const article = await this.articleRepo.store(articleData);
