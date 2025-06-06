@@ -12,4 +12,7 @@ export class PaginatedResponseDto<T> {
 
   @ApiProperty()
   totalPages: number;
+
+  @ApiProperty()
+  total: number;
 }

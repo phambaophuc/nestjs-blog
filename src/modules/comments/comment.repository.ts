@@ -1,6 +1,6 @@
-import { CommentEntity } from '@entities';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CommentEntity } from 'entities';
 import { IsNull, Repository } from 'typeorm';
 
 import { CreateCommentDto } from './dto';

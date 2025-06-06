@@ -1,6 +1,6 @@
-import * as Entities from '@entities';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import * as Entities from 'entities';
 import { DataSourceOptions } from 'typeorm';
 
 export const getTypeOrmConfig = (

@@ -25,10 +25,16 @@ export class ArticleEntity extends BaseEntity {
   @ManyToOne(() => TagEntity, (tag) => tag.articles, { onDelete: 'CASCADE' })
   tag: TagEntity;
 
+  @Column({ type: 'uuid' })
+  tagId: string;
+
   @ManyToOne(() => UserEntity, (user) => user.articles, {
     onDelete: 'CASCADE',
   })
   user: UserEntity;
+
+  @Column({ type: 'uuid' })
+  userId: string;
 
   @OneToMany(() => CommentEntity, (comment) => comment.article, {
     cascade: true,

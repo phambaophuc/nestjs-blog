@@ -1,5 +1,5 @@
-import { TagEntity } from '@entities';
 import { ApiProperty } from '@nestjs/swagger';
+import { TagEntity } from 'entities';
 
 export class TagResponseDto {
   @ApiProperty({ example: 'tag-1' })
