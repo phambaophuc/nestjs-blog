@@ -23,8 +23,10 @@ export class AuthService {
   private readonly jwtAccessExpiresIn: string;
   private readonly jwtRefreshSecret: string;
   private readonly jwtRefreshExpiresIn: string;
+
   private readonly cookieSecure: boolean;
   private readonly cookieSameSite: 'strict' | 'lax' | 'none';
+
   private readonly refreshTokenPath: string;
   private readonly refreshTokenMaxAge: number;
 
@@ -114,7 +116,7 @@ export class AuthService {
       }
 
       const payload = await this.jwtService.verifyAsync(refreshToken, {
-        secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+        secret: this.jwtRefreshSecret,
       });
 
       const user = await this.userService.findById(payload.sub);
