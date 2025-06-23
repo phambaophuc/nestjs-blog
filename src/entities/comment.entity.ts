@@ -25,6 +25,9 @@ export class CommentEntity extends BaseEntity {
   })
   parent: CommentEntity;
 
+  @Column({ type: 'uuid', nullable: true })
+  parentId: string;
+
   @OneToMany(() => CommentEntity, (comment) => comment.parent)
   replies: CommentEntity[];
 }

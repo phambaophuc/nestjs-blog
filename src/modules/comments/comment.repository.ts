@@ -34,7 +34,6 @@ export class CommentRepository extends Repository<CommentEntity> {
       ...comment,
       article: { id: comment.articleId },
       user: { id: comment.userId },
-      parent: { id: comment.parentId },
     });
     return this.save(newComment);
   }

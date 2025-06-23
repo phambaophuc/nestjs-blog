@@ -8,13 +8,13 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  const configService = app.get(ConfigService);
+
   app.enableCors({
-    origin: 'http://localhost:5173',
+    origin:
+      configService.get<string>('app.clientUrl') || 'http://localhost:5173',
     credentials: true,
   });
-
-  const configService = app.get(ConfigService);
-  const appPort = configService.get<number>('app.port') || 3000;
 
   app.useGlobalPipes(new ValidationPipe());
 
@@ -25,9 +25,11 @@ async function bootstrap() {
     .addBearerAuth()
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('swagger', app, documentFactory);
+  SwaggerModule.setup('docs', app, documentFactory);
 
   app.setGlobalPrefix('api');
+
+  const appPort = configService.get<number>('app.port') || 3000;
   await app.listen(appPort);
 }
 bootstrap();
