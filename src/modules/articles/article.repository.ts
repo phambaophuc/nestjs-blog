@@ -1,12 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ArticleEntity } from 'entities';
-import { IsNull, Not, Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
+
+import { ArticleEntity } from '@/entities';
 
 export interface ArticleFilters {
-  tag?: string;
   userId?: string;
-  isPublished?: boolean;
 }
 
 export interface PaginationOptions {
@@ -27,31 +26,11 @@ export class ArticleRepository {
   ) {}
 
   async findWithFiltersAndPagination(
-    filters: ArticleFilters,
     pagination: PaginationOptions,
   ): Promise<ArticleWithPagination> {
     const queryBuilder = this.repository
       .createQueryBuilder('article')
-      .leftJoinAndSelect('article.user', 'user')
-      .leftJoinAndSelect('article.tag', 'tag');
-
-    if (filters.tag) {
-      queryBuilder.andWhere('LOWER(tag.name) = LOWER(:tag)', {
-        tag: filters.tag,
-      });
-    }
-
-    if (filters.userId) {
-      queryBuilder.andWhere('article.userId = :userId', {
-        userId: filters.userId,
-      });
-    }
-
-    if (filters.isPublished !== undefined) {
-      queryBuilder.andWhere('article.isPublished = :isPublished', {
-        isPublished: filters.isPublished,
-      });
-    }
+      .leftJoinAndSelect('article.author', 'author');
 
     const { page, limit } = pagination;
     const skip = (page - 1) * limit;
@@ -63,40 +42,6 @@ export class ArticleRepository {
     return { data, total };
   }
 
-  async findAllRelated(
-    articleId: string,
-    limit: number = 5,
-  ): Promise<ArticleEntity[]> {
-    const currentArticle = await this.repository.findOne({
-      where: { id: articleId },
-      relations: { tag: true },
-    });
-
-    if (!currentArticle?.tag) {
-      return [];
-    }
-
-    return this.repository.find({
-      where: {
-        tag: { id: currentArticle.tag.id },
-        id: Not(articleId),
-      },
-      relations: { user: true, tag: true },
-      order: { createdAt: 'DESC' },
-      take: limit,
-    });
-  }
-
-  async findByTagId(tagId: string): Promise<ArticleEntity[]> {
-    return this.repository.find({
-      where: {
-        tag: { id: tagId },
-      },
-      relations: { tag: true, user: true },
-      order: { createdAt: 'DESC' },
-    });
-  }
-
   async findById(id: string): Promise<ArticleEntity | null> {
     return this.repository.findOne({
       where: {
@@ -104,8 +49,7 @@ export class ArticleRepository {
         comments: { parent: IsNull() },
       },
       relations: {
-        user: true,
-        tag: true,
+        author: true,
         comments: {
           user: true,
           replies: { user: true },
@@ -124,6 +68,6 @@ export class ArticleRepository {
   }
 
   async incrementViews(id: string): Promise<void> {
-    await this.repository.increment({ id }, 'views', 1);
+    await this.repository.increment({ id }, 'viewsCount', 1);
   }
 }

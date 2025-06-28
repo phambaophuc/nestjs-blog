@@ -1,44 +1,43 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CommentEntity } from 'entities';
 import { IsNull, Repository } from 'typeorm';
+
+import { CommentEntity } from '@/entities';
 
 import { CreateCommentDto } from './dto';
 
 @Injectable()
-export class CommentRepository extends Repository<CommentEntity> {
+export class CommentRepository {
   constructor(
     @InjectRepository(CommentEntity)
-    private commentRepo: Repository<CommentEntity>,
-  ) {
-    super(commentRepo.target, commentRepo.manager, commentRepo.queryRunner);
-  }
+    private repo: Repository<CommentEntity>,
+  ) {}
 
-  public async findAll(): Promise<CommentEntity[]> {
-    return this.find({
+  async findAll(): Promise<CommentEntity[]> {
+    return this.repo.find({
       where: { parent: IsNull() },
       relations: { user: true, replies: { user: true } },
       order: { createdAt: 'DESC' },
     });
   }
 
-  public async findById(id: string): Promise<CommentEntity | null> {
-    return this.findOne({
+  async findById(id: string): Promise<CommentEntity | null> {
+    return this.repo.findOne({
       where: { id },
       relations: { user: true, replies: { user: true } },
     });
   }
 
-  public async store(comment: CreateCommentDto): Promise<CommentEntity> {
-    const newComment = this.create({
+  async store(comment: CreateCommentDto): Promise<CommentEntity> {
+    const newComment = this.repo.create({
       ...comment,
       article: { id: comment.articleId },
       user: { id: comment.userId },
     });
-    return this.save(newComment);
+    return this.repo.save(newComment);
   }
 
-  public async destroy(id: string): Promise<void> {
-    await this.delete(id);
+  async destroy(id: string): Promise<void> {
+    await this.repo.delete(id);
   }
 }

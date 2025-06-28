@@ -1,14 +1,15 @@
-import { AuthModule } from '@auth';
-import { configuration, getTypeOrmConfig } from '@config';
-import { ArticleModule } from '@modules/articles';
-import { CommentModule } from '@modules/comments';
-import { StorageModule } from '@modules/storage';
-import { SubscriberModule } from '@modules/subscribers';
-import { TagModule } from '@modules/tags';
-import { UserModule } from '@modules/users';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+
+import { AuthModule } from './auth';
+import { configuration, getTypeOrmConfig } from './config';
+import { ArticleModule } from './modules/articles';
+import { CommentModule } from './modules/comments';
+import { StorageModule } from './modules/storage';
+import { SubscriberModule } from './modules/subscribers';
+import { TagModule } from './modules/tags';
+import { UserModule } from './modules/users';
 
 @Module({
   imports: [

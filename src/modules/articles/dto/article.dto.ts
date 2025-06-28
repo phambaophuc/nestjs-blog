@@ -1,9 +1,10 @@
-import { PaginatedResponseDto } from '@common/dto';
-import { CommentResponseDto } from '@modules/comments/dto/comment.dto';
-import { TagResponseDto } from '@modules/tags/dto/tag.dto';
-import { UserResponseDto } from '@modules/users/dto/user.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { ArticleEntity } from 'entities';
+import { IsOptional } from 'class-validator';
+
+import { PaginatedResponseDto } from '@/common';
+import { ArticleEntity } from '@/entities';
+import { CommentResponseDto } from '@/modules/comments/dto';
+import { UserResponseDto } from '@/modules/users/dto';
 
 export class ArticleResponseDto {
   @ApiProperty()
@@ -12,17 +13,18 @@ export class ArticleResponseDto {
   @ApiProperty()
   title: string;
 
-  @ApiProperty()
-  description: string;
+  @ApiProperty({ nullable: true })
+  @IsOptional()
+  excerpt?: string;
 
   @ApiProperty()
   content: string;
 
   @ApiProperty()
-  imageUrl: string;
+  coverImageUrl?: string;
 
   @ApiProperty()
-  views: number;
+  viewsCount: number;
 
   @ApiProperty()
   createdAt: Date;
@@ -31,10 +33,7 @@ export class ArticleResponseDto {
   updatedAt: Date;
 
   @ApiProperty({ type: () => UserResponseDto })
-  user?: UserResponseDto;
-
-  @ApiProperty({ type: () => TagResponseDto })
-  tag?: TagResponseDto;
+  author?: UserResponseDto;
 
   @ApiProperty({ type: () => [CommentResponseDto], nullable: true })
   comments?: CommentResponseDto[];
@@ -43,14 +42,15 @@ export class ArticleResponseDto {
     return {
       id: article.id,
       title: article.title,
-      description: article.description,
+      excerpt: article.excerpt,
       content: article.content,
-      imageUrl: article.imageUrl,
-      views: article.views,
+      coverImageUrl: article.coverImageUrl,
+      viewsCount: article.viewsCount,
       createdAt: article.createdAt,
       updatedAt: article.updatedAt,
-      user: article.user ? UserResponseDto.fromEntity(article.user) : undefined,
-      tag: article.tag ? TagResponseDto.fromEntity(article.tag) : undefined,
+      author: article.author
+        ? UserResponseDto.fromEntity(article.author)
+        : undefined,
       comments: article.comments
         ? CommentResponseDto.fromEntities(article.comments)
         : [],

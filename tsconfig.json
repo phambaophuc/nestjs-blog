@@ -9,19 +9,9 @@
     "target": "ES2023",
     "sourceMap": true,
     "outDir": "./dist",
-    "baseUrl": "src",
+    "baseUrl": "./",
     "paths": {
-      "@auth": ["auth"],
-      "@auth/*": ["auth/*"],
-      "@common": ["common"],
-      "@common/*": ["common/*"],
-      "@config": ["config"],
-      "@config/*": ["config/*"],
-      "@entities": ["entity"],
-      "@entities/*": ["entity/*"],
-      "@shared": ["shared"],
-      "@shared/*": ["shared/*"],
-      "@modules/*": ["modules/*"]
+      "@/*": ["src/*"]
     },
     "incremental": true,
     "skipLibCheck": true,

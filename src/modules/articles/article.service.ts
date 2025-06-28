@@ -1,12 +1,13 @@
-import { SubscribersService } from '@modules/subscribers';
 import {
   BadRequestException,
   Injectable,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { GeminiService, HtmlUtilsService } from '@shared';
 
+import { GeminiService, HtmlUtilsService } from '@/shared';
+
+import { TagService } from '../tags';
 import { ArticleRepository } from './article.repository';
 import {
   ArticleResponseDto,
@@ -21,27 +22,23 @@ export class ArticleService {
 
   constructor(
     private readonly articleRepo: ArticleRepository,
-    private readonly subscriberService: SubscribersService,
+    private readonly tagService: TagService,
     private readonly geminiService: GeminiService,
     private readonly htmlUtilsService: HtmlUtilsService,
   ) {}
 
   async findAll(query: QueryArticleDto): Promise<GetArticlesResponseDto> {
     try {
-      const { tag, page = 1, limit = 10 } = query;
+      const { page = 1, limit = 10 } = query;
 
       if (page < 1 || limit < 1 || limit > 100) {
         throw new BadRequestException('Invalid pagination parameters');
       }
 
-      const filters = { tag };
       const pagination = { page: Number(page), limit: Number(limit) };
 
       const { data: articles, total } =
-        await this.articleRepo.findWithFiltersAndPagination(
-          filters,
-          pagination,
-        );
+        await this.articleRepo.findWithFiltersAndPagination(pagination);
 
       return {
         data: articles,
@@ -89,18 +86,6 @@ export class ArticleService {
     }
   }
 
-  async findAllRelated(
-    id: string,
-    limit?: number,
-  ): Promise<ArticleResponseDto[]> {
-    try {
-      const relatedArticles = await this.articleRepo.findAllRelated(id, limit);
-      return ArticleResponseDto.fromEntities(relatedArticles);
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
-  }
-
   async create(
     createArticleDto: CreateArticleDto,
     userId: string,
@@ -116,16 +101,22 @@ export class ArticleService {
         throw new BadRequestException('Article title is required');
       }
 
-      const [description, imageUrl] = await Promise.all([
-        this.generateDescription(content),
+      const [slug, excerpt, imageUrl, readingTime, tags] = await Promise.all([
+        this.generateSlug(title),
+        this.generateExcerpt(content),
         this.extractImageUrl(content),
+        this.calculateReadingTime(content),
+        this.tagService.generateTagsAndSave(content),
       ]);
 
       const articleData = {
         ...createArticleDto,
-        description,
-        imageUrl: imageUrl ?? undefined,
-        userId,
+        slug,
+        excerpt,
+        coverImageUrl: imageUrl ?? undefined,
+        readingTime,
+        tags,
+        authorId: userId,
       };
 
       const article = await this.articleRepo.store(articleData);
@@ -163,7 +154,16 @@ export class ArticleService {
     }
   }
 
-  private async generateDescription(content: string): Promise<string> {
+  private generateSlug(title: string): string {
+    return title
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/--+/g, '-')
+      .trim();
+  }
+
+  private async generateExcerpt(content: string): Promise<string> {
     try {
       return await this.geminiService.summarize(content);
     } catch (error) {
@@ -179,5 +179,11 @@ export class ArticleService {
       this.logger.warn(`Failed to extract image URL: ${error.message}`);
       return null;
     }
+  }
+
+  private calculateReadingTime(content: string): number {
+    const wordsPerMinute = 200;
+    const wordCount = content.split(/\s+/).length;
+    return Math.ceil(wordCount / wordsPerMinute);
   }
 }

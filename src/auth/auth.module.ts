@@ -1,7 +1,8 @@
-import { UserModule } from '@modules/users';
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
-import { SupabaseModule } from '@shared';
+
+import { UserModule } from '@/modules/users';
+import { SupabaseModule } from '@/shared';
 
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';

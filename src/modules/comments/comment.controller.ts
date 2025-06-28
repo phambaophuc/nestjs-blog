@@ -1,5 +1,3 @@
-import { JwtAuthGuard } from '@auth';
-import { User as UserDecorator } from '@common';
 import {
   Body,
   Controller,
@@ -19,6 +17,9 @@ import {
 } from '@nestjs/swagger';
 import { User } from '@supabase/supabase-js';
 import { Response } from 'express';
+
+import { JwtAuthGuard } from '@/auth';
+import { User as UserDecorator } from '@/common';
 
 import { CommentService } from './comment.service';
 import { CommentResponseDto, CreateCommentDto } from './dto';

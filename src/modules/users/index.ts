@@ -1,3 +1,3 @@
-export * from './user.controller';
+export * from './dto';
 export * from './user.module';
 export * from './user.service';

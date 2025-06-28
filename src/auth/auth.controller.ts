@@ -1,5 +1,3 @@
-import { User as UserDecorator } from '@common';
-import { UserResponseDto } from '@modules/users/dto';
 import {
   Body,
   Controller,
@@ -11,6 +9,9 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
+
+import { User as UserDecorator } from '@/common';
+import { UserResponseDto } from '@/modules/users';
 
 import { AuthService } from './auth.service';
 import {

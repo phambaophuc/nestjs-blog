@@ -1,6 +1,3 @@
-import { JwtAuthGuard } from '@auth';
-import { User } from '@common/decorators';
-import { UserResponseDto } from '@modules/users/dto';
 import {
   Body,
   Controller,
@@ -23,6 +20,10 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
+import { JwtAuthGuard } from '@/auth';
+import { User } from '@/common';
+
+import { UserResponseDto } from '../users/dto';
 import { ArticleService } from './article.service';
 import {
   ArticleResponseDto,
@@ -62,15 +63,15 @@ export class ArticleController {
     return this.articleService.findById(id);
   }
 
-  @Get(':id/related')
-  @ApiOkResponse({
-    description: 'Successfully retrieved related articles',
-    type: [ArticleResponseDto],
-  })
-  @ApiParam({ name: 'id', description: 'Article ID' })
-  public async findRelatedArticles(@Param('id', ParseUUIDPipe) id: string) {
-    return this.articleService.findAllRelated(id);
-  }
+  // @Get(':id/related')
+  // @ApiOkResponse({
+  //   description: 'Successfully retrieved related articles',
+  //   type: [ArticleResponseDto],
+  // })
+  // @ApiParam({ name: 'id', description: 'Article ID' })
+  // public async findRelatedArticles(@Param('id', ParseUUIDPipe) id: string) {
+  //   return this.articleService.findAllRelated(id);
+  // }
 
   @Post()
   @UseGuards(JwtAuthGuard)

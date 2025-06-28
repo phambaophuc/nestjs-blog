@@ -1,10 +1,10 @@
-import { ArticleService } from '@modules/articles';
 import {
   BadRequestException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 
+import { ArticleService } from '../articles';
 import { CommentRepository } from './comment.repository';
 import { CommentResponseDto, CreateCommentDto } from './dto';
 

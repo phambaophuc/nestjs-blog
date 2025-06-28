@@ -1,5 +1,3 @@
-import { UserService } from '@modules/users';
-import { UserResponseDto } from '@modules/users/dto';
 import {
   BadRequestException,
   Injectable,
@@ -9,6 +7,8 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { compare, hash } from 'bcrypt';
 import { Request, Response } from 'express';
+
+import { UserResponseDto, UserService } from '@/modules/users';
 
 import {
   SignInDto,
