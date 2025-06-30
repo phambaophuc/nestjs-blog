@@ -1,8 +1,9 @@
-import { AppConfig } from '@config';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { EmailService } from '@shared';
-import { ArticleEntity } from 'entities';
+
+import { AppConfig } from '@/config';
+import { ArticleEntity } from '@/entities';
+import { EmailService } from '@/shared';
 
 import { SubscriberResponseDto } from './dto';
 import { SubscriberRepository } from './subscribers.repository';

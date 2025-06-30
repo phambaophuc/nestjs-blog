@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { SubscriberEntity } from '../../../entities/subscriber.entity';
+import { SubscriberEntity } from '@/entities';
 
 export class SubscriberResponseDto {
   @ApiProperty()

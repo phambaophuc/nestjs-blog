@@ -1,6 +1,3 @@
-import { JwtAuthGuard } from '@auth';
-import { User } from '@common/decorators';
-import { UserResponseDto } from '@modules/users/dto';
 import {
   Body,
   Controller,
@@ -23,6 +20,10 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
+import { JwtAuthGuard } from '@/auth';
+import { User } from '@/common';
+
+import { UserResponseDto } from '../users/dto';
 import { ArticleService } from './article.service';
 import {
   ArticleResponseDto,
@@ -41,13 +42,24 @@ export class ArticleController {
     description: 'Successfully retrieved articles',
     type: GetArticlesResponseDto,
   })
-  @ApiQuery({ name: 'tag', required: false, description: 'Filter by tag' })
   @ApiQuery({ name: 'page', required: false, description: 'Page number' })
   @ApiQuery({ name: 'limit', required: false, description: 'Items per page' })
   public async findAll(
     @Query() query: QueryArticleDto,
   ): Promise<GetArticlesResponseDto> {
     return this.articleService.findAll(query);
+  }
+
+  @Get('slug/:slug')
+  @ApiOkResponse({
+    description: 'Successfully retrieved article',
+    type: ArticleResponseDto,
+  })
+  @ApiParam({ name: 'slug', description: 'Article Slug' })
+  public async findBySlug(
+    @Param('slug') slug: string,
+  ): Promise<ArticleResponseDto> {
+    return this.articleService.findBySlug(slug);
   }
 
   @Get(':id')
@@ -62,15 +74,15 @@ export class ArticleController {
     return this.articleService.findById(id);
   }
 
-  @Get(':id/related')
-  @ApiOkResponse({
-    description: 'Successfully retrieved related articles',
-    type: [ArticleResponseDto],
-  })
-  @ApiParam({ name: 'id', description: 'Article ID' })
-  public async findRelatedArticles(@Param('id', ParseUUIDPipe) id: string) {
-    return this.articleService.findAllRelated(id);
-  }
+  // @Get(':id/related')
+  // @ApiOkResponse({
+  //   description: 'Successfully retrieved related articles',
+  //   type: [ArticleResponseDto],
+  // })
+  // @ApiParam({ name: 'id', description: 'Article ID' })
+  // public async findRelatedArticles(@Param('id', ParseUUIDPipe) id: string) {
+  //   return this.articleService.findAllRelated(id);
+  // }
 
   @Post()
   @UseGuards(JwtAuthGuard)

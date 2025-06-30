@@ -1,7 +1,8 @@
-import { AppConfig } from '@config';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+
+import { AppConfig } from '@/config';
 
 @Injectable()
 export class SupabaseService {

@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { SupabaseService } from '@shared';
+
+import { SupabaseService } from '@/shared';
 
 @Injectable()
 export class StorageService {

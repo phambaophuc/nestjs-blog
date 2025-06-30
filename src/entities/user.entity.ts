@@ -1,10 +1,11 @@
-import { Column, Entity, OneToMany } from 'typeorm';
+import { Column, Entity, Index, OneToMany } from 'typeorm';
 
 import { ArticleEntity } from './article.entity';
 import { BaseEntity } from './base.entity';
 import { CommentEntity } from './comment.entity';
 
 @Entity('users')
+@Index(['email'])
 export class UserEntity extends BaseEntity {
   @Column({ nullable: false, unique: true })
   email: string;
@@ -21,7 +22,7 @@ export class UserEntity extends BaseEntity {
   @Column({ type: 'text', nullable: true })
   refreshToken: string | null;
 
-  @OneToMany(() => ArticleEntity, (article) => article.user)
+  @OneToMany(() => ArticleEntity, (article) => article.author)
   articles: ArticleEntity[];
 
   @OneToMany(() => CommentEntity, (comment) => comment.user)

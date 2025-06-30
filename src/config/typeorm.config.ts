@@ -1,7 +1,8 @@
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-import * as Entities from 'entities';
 import { DataSourceOptions } from 'typeorm';
+
+import * as Entities from '@/entities';
 
 export const getTypeOrmConfig = (
   configService: ConfigService,

@@ -25,6 +25,12 @@ export class TagController {
     return this.tagService.findAll();
   }
 
+  @Get('trending')
+  @ApiOkResponse({ type: [TagResponseDto] })
+  public async findTrendingTags(): Promise<TagResponseDto[]> {
+    return this.tagService.findTrendingTags();
+  }
+
   @Get(':id')
   @ApiOkResponse({ type: TagResponseDto })
   public async findById(@Param('id') id: string): Promise<TagResponseDto> {

@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
-import { SupabaseModule } from '@shared';
+
+import { SupabaseModule } from '@/shared';
 
 import { StorageController } from './storage.controller';
 import { StorageService } from './storage.service';

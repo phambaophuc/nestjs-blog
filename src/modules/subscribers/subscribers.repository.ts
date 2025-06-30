@@ -1,39 +1,32 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { SubscriberEntity } from 'entities';
 import { Repository } from 'typeorm';
+
+import { SubscriberEntity } from '@/entities';
 
 import { CreateSubscriberDto } from './dto';
 
 @Injectable()
-export class SubscriberRepository extends Repository<SubscriberEntity> {
+export class SubscriberRepository {
   constructor(
     @InjectRepository(SubscriberEntity)
-    private subcriberRepo: Repository<SubscriberEntity>,
-  ) {
-    super(
-      subcriberRepo.target,
-      subcriberRepo.manager,
-      subcriberRepo.queryRunner,
-    );
+    private repo: Repository<SubscriberEntity>,
+  ) {}
+
+  async findAll(): Promise<SubscriberEntity[]> {
+    return this.repo.find();
   }
 
-  public async findAll(): Promise<SubscriberEntity[]> {
-    return this.find();
+  async findByEmail(email: string): Promise<SubscriberEntity | null> {
+    return this.repo.findOne({ where: { email } });
   }
 
-  public async findByEmail(email: string): Promise<SubscriberEntity | null> {
-    return this.findOne({ where: { email } });
+  async store(subscriber: CreateSubscriberDto): Promise<SubscriberEntity> {
+    const newSubscriber = this.repo.create(subscriber);
+    return this.repo.save(newSubscriber);
   }
 
-  public async store(
-    subscriber: CreateSubscriberDto,
-  ): Promise<SubscriberEntity> {
-    const newSubscriber = this.create(subscriber);
-    return this.save(newSubscriber);
-  }
-
-  public async destroyByEmail(email: string): Promise<void> {
-    await this.delete({ email });
+  async destroyByEmail(email: string): Promise<void> {
+    await this.repo.delete({ email });
   }
 }

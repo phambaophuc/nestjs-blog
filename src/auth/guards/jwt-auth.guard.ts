@@ -1,5 +1,3 @@
-import { AuthService } from '@auth/auth.service';
-import { UserResponseDto } from '@modules/users/dto';
 import {
   CanActivate,
   ExecutionContext,
@@ -10,6 +8,10 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
+
+import { UserResponseDto } from '@/modules/users';
+
+import { AuthService } from '../auth.service';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace

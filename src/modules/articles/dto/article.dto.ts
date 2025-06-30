@@ -1,9 +1,10 @@
-import { PaginatedResponseDto } from '@common/dto';
-import { CommentResponseDto } from '@modules/comments/dto/comment.dto';
-import { TagResponseDto } from '@modules/tags/dto/tag.dto';
-import { UserResponseDto } from '@modules/users/dto/user.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { ArticleEntity } from 'entities';
+import { IsOptional } from 'class-validator';
+
+import { PaginatedResponseDto } from '@/common';
+import { ArticleEntity } from '@/entities';
+import { CommentResponseDto } from '@/modules/comments/dto';
+import { UserResponseDto } from '@/modules/users/dto';
 
 export class ArticleResponseDto {
   @ApiProperty()
@@ -13,44 +14,53 @@ export class ArticleResponseDto {
   title: string;
 
   @ApiProperty()
-  description: string;
+  slug: string;
+
+  @ApiProperty({ nullable: true })
+  @IsOptional()
+  excerpt?: string;
 
   @ApiProperty()
   content: string;
 
-  @ApiProperty()
-  imageUrl: string;
+  @ApiProperty({ nullable: true })
+  @IsOptional()
+  coverImageUrl?: string;
 
   @ApiProperty()
-  views: number;
+  viewsCount: number;
+
+  @ApiProperty()
+  readingTime: number;
 
   @ApiProperty()
   createdAt: Date;
 
   @ApiProperty()
-  updatedAt: Date;
+  tags: string[];
 
   @ApiProperty({ type: () => UserResponseDto })
-  user?: UserResponseDto;
+  @IsOptional()
+  author?: UserResponseDto;
 
-  @ApiProperty({ type: () => TagResponseDto })
-  tag?: TagResponseDto;
-
-  @ApiProperty({ type: () => [CommentResponseDto], nullable: true })
-  comments?: CommentResponseDto[];
+  @ApiProperty({ type: () => [CommentResponseDto] })
+  comments: CommentResponseDto[];
 
   static fromEntity(article: ArticleEntity): ArticleResponseDto {
     return {
       id: article.id,
       title: article.title,
-      description: article.description,
+      slug: article.slug,
+      excerpt: article.excerpt,
       content: article.content,
-      imageUrl: article.imageUrl,
-      views: article.views,
+      coverImageUrl: article.coverImageUrl,
+      viewsCount: article.viewsCount,
+      readingTime: article.readingTime,
       createdAt: article.createdAt,
-      updatedAt: article.updatedAt,
-      user: article.user ? UserResponseDto.fromEntity(article.user) : undefined,
-      tag: article.tag ? TagResponseDto.fromEntity(article.tag) : undefined,
+      tags: article.tags.map((tag) => tag.name),
+      author: article.author
+        ? UserResponseDto.fromEntity(article.author)
+        : undefined,
       comments: article.comments
         ? CommentResponseDto.fromEntities(article.comments)
         : [],
