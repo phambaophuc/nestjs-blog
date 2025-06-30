@@ -13,6 +13,9 @@ export class ArticleResponseDto {
   @ApiProperty()
   title: string;
 
+  @ApiProperty()
+  slug: string;
+
   @ApiProperty({ nullable: true })
   @IsOptional()
   excerpt?: string;
@@ -20,34 +23,41 @@ export class ArticleResponseDto {
   @ApiProperty()
   content: string;
 
-  @ApiProperty()
+  @ApiProperty({ nullable: true })
+  @IsOptional()
   coverImageUrl?: string;
 
   @ApiProperty()
   viewsCount: number;
 
   @ApiProperty()
+  readingTime: number;
+
+  @ApiProperty()
   createdAt: Date;
 
   @ApiProperty()
-  updatedAt: Date;
+  tags: string[];
 
   @ApiProperty({ type: () => UserResponseDto })
+  @IsOptional()
   author?: UserResponseDto;
 
-  @ApiProperty({ type: () => [CommentResponseDto], nullable: true })
-  comments?: CommentResponseDto[];
+  @ApiProperty({ type: () => [CommentResponseDto] })
+  comments: CommentResponseDto[];
 
   static fromEntity(article: ArticleEntity): ArticleResponseDto {
     return {
       id: article.id,
       title: article.title,
+      slug: article.slug,
       excerpt: article.excerpt,
       content: article.content,
       coverImageUrl: article.coverImageUrl,
       viewsCount: article.viewsCount,
+      readingTime: article.readingTime,
       createdAt: article.createdAt,
-      updatedAt: article.updatedAt,
+      tags: article.tags.map((tag) => tag.name),
       author: article.author
         ? UserResponseDto.fromEntity(article.author)
         : undefined,

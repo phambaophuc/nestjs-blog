@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AuthModule } from '@/auth';
 import { ArticleEntity } from '@/entities';
-import { GeminiModule, HtmlUtilsModule } from '@/shared';
+import { HtmlUtilsModule } from '@/shared';
 
 import { SubscriberModule } from '../subscribers';
 import { TagModule } from '../tags';
@@ -18,7 +18,6 @@ import { ArticleService } from './article.service';
     AuthModule,
     SubscriberModule,
     HtmlUtilsModule,
-    GeminiModule,
   ],
   providers: [ArticleRepository, ArticleService],
   controllers: [ArticleController],

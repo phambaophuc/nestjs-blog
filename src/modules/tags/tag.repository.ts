@@ -25,6 +25,15 @@ export class TagRepository {
     return this.repo.findOne({ where: { id } });
   }
 
+  async findTrendingTags(): Promise<TagEntity[]> {
+    return this.repo
+      .createQueryBuilder('tag')
+      .leftJoin('tag.articles', 'article')
+      .groupBy('tag.id')
+      .having('COUNT(article.id) > :minArticles', { minArticles: 2 })
+      .getMany();
+  }
+
   async store(tag: CreateTagDto): Promise<TagEntity> {
     const newTag = this.repo.create(tag);
     return this.repo.save(newTag);

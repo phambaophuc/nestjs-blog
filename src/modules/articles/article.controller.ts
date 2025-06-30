@@ -42,13 +42,24 @@ export class ArticleController {
     description: 'Successfully retrieved articles',
     type: GetArticlesResponseDto,
   })
-  @ApiQuery({ name: 'tag', required: false, description: 'Filter by tag' })
   @ApiQuery({ name: 'page', required: false, description: 'Page number' })
   @ApiQuery({ name: 'limit', required: false, description: 'Items per page' })
   public async findAll(
     @Query() query: QueryArticleDto,
   ): Promise<GetArticlesResponseDto> {
     return this.articleService.findAll(query);
+  }
+
+  @Get('slug/:slug')
+  @ApiOkResponse({
+    description: 'Successfully retrieved article',
+    type: ArticleResponseDto,
+  })
+  @ApiParam({ name: 'slug', description: 'Article Slug' })
+  public async findBySlug(
+    @Param('slug') slug: string,
+  ): Promise<ArticleResponseDto> {
+    return this.articleService.findBySlug(slug);
   }
 
   @Get(':id')

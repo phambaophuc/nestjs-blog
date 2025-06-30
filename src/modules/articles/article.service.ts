@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
-import { GeminiService, HtmlUtilsService } from '@/shared';
+import { HtmlUtilsService } from '@/shared';
 
 import { TagService } from '../tags';
 import { ArticleRepository } from './article.repository';
@@ -23,7 +23,6 @@ export class ArticleService {
   constructor(
     private readonly articleRepo: ArticleRepository,
     private readonly tagService: TagService,
-    private readonly geminiService: GeminiService,
     private readonly htmlUtilsService: HtmlUtilsService,
   ) {}
 
@@ -41,7 +40,7 @@ export class ArticleService {
         await this.articleRepo.findWithFiltersAndPagination(pagination);
 
       return {
-        data: articles,
+        data: ArticleResponseDto.fromEntities(articles),
         limit: pagination.limit,
         page: pagination.page,
         totalPages: Math.ceil(total / pagination.limit),
@@ -61,10 +60,32 @@ export class ArticleService {
     }
   }
 
+  async findBySlug(slug: string): Promise<ArticleResponseDto> {
+    try {
+      const article = await this.articleRepo.findBySlug(slug);
+
+      if (!article) {
+        throw new NotFoundException(`Article ${slug} not found`);
+      }
+      this.incrementViewsAsync(article.id);
+
+      return ArticleResponseDto.fromEntity(article);
+    } catch (error) {
+      this.logger.error(
+        `Error finding article ${slug}: ${error.message}`,
+        error.stack,
+      );
+
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+
+      throw new BadRequestException('Failed to retrieve article');
+    }
+  }
+
   async findById(id: string): Promise<ArticleResponseDto> {
     try {
-      this.incrementViewsAsync(id);
-
       const article = await this.articleRepo.findById(id);
 
       if (!article) {
@@ -163,13 +184,37 @@ export class ArticleService {
       .trim();
   }
 
-  private async generateExcerpt(content: string): Promise<string> {
-    try {
-      return await this.geminiService.summarize(content);
-    } catch (error) {
-      this.logger.warn(`Failed to generate description: ${error.message}`);
-      return content.replace(/<[^>]*>/g, '').substring(0, 200) + '...';
+  private generateExcerpt(content: string, maxLength = 140): string {
+    if (!content) return '';
+
+    let text = content
+      .replace(/<(script|style)[^>]*>[\s\S]*?<\/(script|style)>/gi, '')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/&[^;]+;/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    const lines = text.split('\n').filter((l) => l.trim());
+    if (lines.length > 1 && lines[0].length < 80 && !/[.!?]$/.test(lines[0])) {
+      text = lines.slice(1).join(' ');
     }
+
+    const sentences = text.split(/[.!?]+/).filter((s) => s.trim().length > 10);
+    let result = '';
+
+    for (const sentence of sentences) {
+      const clean = sentence.trim();
+      if (result.length + clean.length > maxLength) break;
+      result += (result ? '. ' : '') + clean;
+      if (result.length >= maxLength * 0.8) break;
+    }
+
+    if (!result) {
+      result = text.slice(0, maxLength).trim();
+      if (!/[.!?]$/.test(result)) result += '...';
+    }
+
+    return result;
   }
 
   private extractImageUrl(content: string): string | null {

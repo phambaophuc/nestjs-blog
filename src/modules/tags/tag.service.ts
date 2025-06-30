@@ -12,39 +12,19 @@ import { TagRepository } from './tag.repository';
 
 const categories = [
   'Web Development',
-  'JavaScript',
-  'TypeScript',
-  'React',
-  'Next.js',
-  'Node.js',
-  'NestJS',
+  'Programming',
+  'UI/UX Design',
   'Database',
   'DevOps',
   'Git',
-
   'AI Tools',
   'Machine Learning',
   'Prompt Engineering',
   'ChatGPT',
   'Automation',
-
-  'Productivity',
-  'Learning to Code',
-  'Self Improvement',
-  'Time Management',
-  'Career Tips',
-
-  'Life Lessons',
-  'Personal Growth',
-  'Journaling',
-  'Daily Thoughts',
-  'Book Review',
-
-  'Startup',
-  'Side Project',
-  'UI/UX Design',
   'Open Source',
-  'Marketing Basics',
+  'Side Project',
+  'Startup',
 ];
 
 @Injectable()
@@ -70,6 +50,15 @@ export class TagService {
         throw new NotFoundException('Tag not found.');
       }
       return TagResponseDto.fromEntity(tag);
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async findTrendingTags(): Promise<TagResponseDto[]> {
+    try {
+      const tags = await this.repo.findTrendingTags();
+      return TagResponseDto.fromEntities(tags);
     } catch (error) {
       throw new BadRequestException(error.message);
     }

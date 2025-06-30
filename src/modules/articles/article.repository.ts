@@ -28,16 +28,22 @@ export class ArticleRepository {
   async findWithFiltersAndPagination(
     pagination: PaginationOptions,
   ): Promise<ArticleWithPagination> {
-    const queryBuilder = this.repository
-      .createQueryBuilder('article')
-      .leftJoinAndSelect('article.author', 'author');
-
     const { page, limit } = pagination;
     const skip = (page - 1) * limit;
 
-    queryBuilder.orderBy('article.createdAt', 'DESC').skip(skip).take(limit);
-
-    const [data, total] = await queryBuilder.getManyAndCount();
+    const [data, total] = await this.repository.findAndCount({
+      relations: {
+        author: true,
+        tags: true,
+        comments: {
+          user: true,
+          replies: { user: true },
+        },
+      },
+      order: { createdAt: 'DESC' },
+      skip,
+      take: limit,
+    });
 
     return { data, total };
   }
@@ -54,6 +60,24 @@ export class ArticleRepository {
           user: true,
           replies: { user: true },
         },
+        tags: true,
+      },
+    });
+  }
+
+  async findBySlug(slug: string): Promise<ArticleEntity | null> {
+    return this.repository.findOne({
+      where: {
+        slug,
+        comments: { parent: IsNull() },
+      },
+      relations: {
+        author: true,
+        comments: {
+          user: true,
+          replies: { user: true },
+        },
+        tags: true,
       },
     });
   }

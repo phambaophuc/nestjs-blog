@@ -67,7 +67,7 @@ export class GeminiService {
   async generateTags(
     content: string,
     categories: string[],
-    maxTags: number = 5,
+    maxTags: number = 4,
   ): Promise<GeneratedTags> {
     try {
       const cleanedContent = content?.trim();
