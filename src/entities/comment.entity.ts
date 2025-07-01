@@ -14,10 +14,16 @@ export class CommentEntity extends BaseEntity {
   })
   article: ArticleEntity;
 
+  @Column({ type: 'uuid' })
+  articleId: string;
+
   @ManyToOne(() => UserEntity, (user) => user.comments, {
     onDelete: 'CASCADE',
   })
   user: UserEntity;
+
+  @Column({ type: 'uuid' })
+  userId: string;
 
   @ManyToOne(() => CommentEntity, (comment) => comment.replies, {
     nullable: true,

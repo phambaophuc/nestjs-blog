@@ -16,21 +16,28 @@ export class TagRepository {
   async findAll(): Promise<TagEntity[]> {
     return this.repo
       .createQueryBuilder('tag')
-      .leftJoin('tag.articles', 'article')
+      .leftJoinAndSelect('tag.articles', 'article')
       .where('article.id IS NOT NULL')
       .getMany();
   }
 
   async findById(id: string): Promise<TagEntity | null> {
-    return this.repo.findOne({ where: { id } });
+    return this.repo.findOne({ where: { id }, relations: { articles: true } });
   }
 
   async findTrendingTags(): Promise<TagEntity[]> {
-    return this.repo
+    const subQuery = this.repo
       .createQueryBuilder('tag')
       .leftJoin('tag.articles', 'article')
       .groupBy('tag.id')
       .having('COUNT(article.id) > :minArticles', { minArticles: 2 })
+      .select('tag.id');
+
+    return this.repo
+      .createQueryBuilder('tag')
+      .leftJoinAndSelect('tag.articles', 'article')
+      .where(`tag.id IN (${subQuery.getQuery()})`)
+      .setParameters(subQuery.getParameters())
       .getMany();
   }
 

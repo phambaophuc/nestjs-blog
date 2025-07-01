@@ -15,14 +15,18 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { User } from '@supabase/supabase-js';
 import { Response } from 'express';
 
 import { JwtAuthGuard } from '@/auth';
-import { User as UserDecorator } from '@/common';
+import { UserDecorator } from '@/common';
 
+import { UserDetailResponse } from '../users';
 import { CommentService } from './comment.service';
-import { CommentResponseDto, CreateCommentDto } from './dto';
+import {
+  CommentDetailResponse,
+  CommentListResponse,
+  CreateCommentDto,
+} from './dto';
 
 @ApiTags('CommentController')
 @Controller('comments')
@@ -30,29 +34,28 @@ export class CommentController {
   constructor(private readonly commentService: CommentService) {}
 
   @Get()
-  @ApiOkResponse({ type: [CommentResponseDto] })
-  public async findAll(): Promise<CommentResponseDto[]> {
+  @ApiOkResponse({ type: [CommentListResponse] })
+  public async findAll(): Promise<CommentListResponse[]> {
     return this.commentService.findAll();
   }
 
   @Get(':id')
-  @ApiOkResponse({ type: CommentResponseDto })
-  public async findById(@Param('id') id: string): Promise<CommentResponseDto> {
+  @ApiOkResponse({ type: CommentDetailResponse })
+  public async findById(
+    @Param('id') id: string,
+  ): Promise<CommentDetailResponse> {
     return this.commentService.findById(id);
   }
 
   @Post()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiResponse({ status: 201, type: CommentResponseDto })
+  @ApiResponse({ status: 201, type: CommentDetailResponse })
   public async create(
-    @UserDecorator() user: User,
+    @UserDecorator() user: UserDetailResponse,
     @Body() comment: CreateCommentDto,
-  ): Promise<CommentResponseDto> {
-    return this.commentService.create({
-      ...comment,
-      userId: user.id,
-    });
+  ): Promise<CommentDetailResponse> {
+    return this.commentService.create(comment, user.id);
   }
 
   @Delete(':id')

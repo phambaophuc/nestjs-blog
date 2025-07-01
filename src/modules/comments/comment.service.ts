@@ -6,7 +6,12 @@ import {
 
 import { ArticleService } from '../articles';
 import { CommentRepository } from './comment.repository';
-import { CommentResponseDto, CreateCommentDto } from './dto';
+import {
+  CommentDetailResponse,
+  CommentListResponse,
+  CommentMapper,
+  CreateCommentDto,
+} from './dto';
 
 @Injectable()
 export class CommentService {
@@ -15,7 +20,10 @@ export class CommentService {
     private readonly articleService: ArticleService,
   ) {}
 
-  async create(comment: CreateCommentDto): Promise<CommentResponseDto> {
+  async create(
+    comment: CreateCommentDto,
+    userId: string,
+  ): Promise<CommentDetailResponse> {
     try {
       const { articleId, parentId } = comment;
 
@@ -29,27 +37,27 @@ export class CommentService {
           throw new NotFoundException('Parent comment not found.');
       }
 
-      const newComment = await this.commentRepo.store(comment);
+      const newComment = await this.commentRepo.store({ ...comment, userId });
       return this.findById(newComment.id);
     } catch (error) {
       throw new BadRequestException(error.message);
     }
   }
 
-  async findAll(): Promise<CommentResponseDto[]> {
+  async findAll(): Promise<CommentListResponse[]> {
     try {
       const comments = await this.commentRepo.findAll();
-      return CommentResponseDto.fromEntities(comments);
+      return CommentMapper.toLists(comments);
     } catch (error) {
       throw new BadRequestException(error.message);
     }
   }
 
-  async findById(id: string): Promise<CommentResponseDto> {
+  async findById(id: string): Promise<CommentDetailResponse> {
     try {
       const comment = await this.commentRepo.findById(id);
       if (!comment) throw new NotFoundException('Comment not found.');
-      return CommentResponseDto.fromEntity(comment);
+      return CommentMapper.toDetail(comment);
     } catch (error) {
       throw new BadRequestException(error.message);
     }

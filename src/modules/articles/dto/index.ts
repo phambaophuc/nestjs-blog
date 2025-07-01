@@ -1,3 +1,3 @@
 export * from './article.dto';
-export * from './create.dto';
-export * from './query.dto';
+export * from './article.mapper';
+export * from './responses.dto';

@@ -10,8 +10,8 @@ import {
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 
-import { User as UserDecorator } from '@/common';
-import { UserResponseDto } from '@/modules/users';
+import { UserDecorator } from '@/common';
+import { UserDetailResponse } from '@/modules/users';
 
 import { AuthService } from './auth.service';
 import {
@@ -54,7 +54,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   public async logout(
-    @UserDecorator() user: UserResponseDto,
+    @UserDecorator() user: UserDetailResponse,
     @Res({ passthrough: true }) res: Response,
   ) {
     await this.authService.signOut(user.id, res);
@@ -64,7 +64,7 @@ export class AuthController {
   @Get('users/me')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  public getUser(@UserDecorator() user: UserResponseDto) {
+  public getUser(@UserDecorator() user: UserDetailResponse) {
     return user;
   }
 }

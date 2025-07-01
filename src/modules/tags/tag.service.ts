@@ -7,7 +7,8 @@ import {
 import { TagEntity } from '@/entities';
 import { GeminiService } from '@/shared';
 
-import { CreateTagDto, TagResponseDto } from './dto';
+import { CreateTagDto, TagMapper } from './dto';
+import { TagDetailResponse, TagListResponse } from './dto/responses.dto';
 import { TagRepository } from './tag.repository';
 
 const categories = [
@@ -34,40 +35,40 @@ export class TagService {
     private readonly geminiService: GeminiService,
   ) {}
 
-  async findAll(): Promise<TagResponseDto[]> {
+  async findAll(): Promise<TagListResponse[]> {
     try {
       const tags = await this.repo.findAll();
-      return TagResponseDto.fromEntities(tags);
+      return TagMapper.toLists(tags);
     } catch (error) {
       throw new BadRequestException(error.message);
     }
   }
 
-  async findById(id: string): Promise<TagResponseDto> {
+  async findById(id: string): Promise<TagDetailResponse> {
     try {
       const tag = await this.repo.findById(id);
       if (!tag) {
         throw new NotFoundException('Tag not found.');
       }
-      return TagResponseDto.fromEntity(tag);
+      return TagMapper.toDetail(tag);
     } catch (error) {
       throw new BadRequestException(error.message);
     }
   }
 
-  async findTrendingTags(): Promise<TagResponseDto[]> {
+  async findTrendingTags(): Promise<TagListResponse[]> {
     try {
       const tags = await this.repo.findTrendingTags();
-      return TagResponseDto.fromEntities(tags);
+      return TagMapper.toLists(tags);
     } catch (error) {
       throw new BadRequestException(error.message);
     }
   }
 
-  async create(createTagDto: CreateTagDto): Promise<TagResponseDto> {
+  async create(createTagDto: CreateTagDto): Promise<TagDetailResponse> {
     try {
       const savedTag = await this.repo.store(createTagDto);
-      return TagResponseDto.fromEntity(savedTag);
+      return TagMapper.toDetail(savedTag);
     } catch (error) {
       throw new BadRequestException(error.message);
     }

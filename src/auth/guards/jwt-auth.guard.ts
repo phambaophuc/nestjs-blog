@@ -9,7 +9,7 @@ import {
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 
-import { UserResponseDto } from '@/modules/users';
+import { UserDetailResponse } from '@/modules/users';
 
 import { AuthService } from '../auth.service';
 
@@ -17,7 +17,7 @@ declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Express {
     interface Request {
-      user?: UserResponseDto;
+      user?: UserDetailResponse;
     }
   }
 }

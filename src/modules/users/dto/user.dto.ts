@@ -1,54 +1,52 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsEmail, IsUrl, IsUUID } from 'class-validator';
 
-import { UserEntity } from '@/entities';
+import { ArticleDetailDto } from '@/modules/articles/dto';
 
-export class UserResponseDto {
-  @ApiProperty({ example: 'user-1' })
+class UserBaseDto {
+  @ApiProperty()
+  @IsUUID()
   id: string;
-
-  @ApiProperty({ example: 'user' })
-  displayName: string;
-
-  @ApiProperty({ example: 'user@example.com' })
-  email: string;
-
-  @ApiProperty({ example: 'https://example.com/avatar.jpg', nullable: true })
-  avatarUrl?: string;
 
   @ApiProperty()
-  refreshToken: string | null;
+  displayName: string;
 
-  static fromEntity(user: UserEntity | UserInternalDto): UserResponseDto {
-    return {
-      id: user.id,
-      displayName: user.displayName,
-      email: user.email,
-      avatarUrl: user.avatarUrl,
-      refreshToken: user.refreshToken,
-    };
-  }
+  @ApiProperty()
+  @IsEmail()
+  email: string;
 
-  static fromEntities(users: UserEntity[]): UserResponseDto[] {
-    return users.map((user) => UserResponseDto.fromEntity(user));
-  }
+  @ApiProperty()
+  createdAt: Date;
 }
 
-export class UserInternalDto {
-  id: string;
-  email: string;
-  displayName: string;
+export class UserDetailDto extends UserBaseDto {
+  @ApiPropertyOptional()
+  @IsUrl()
   avatarUrl?: string;
-  password: string;
-  refreshToken: string | null;
 
-  static fromEntity(user: UserEntity): UserInternalDto {
-    return {
-      id: user.id,
-      displayName: user.displayName,
-      email: user.email,
-      avatarUrl: user.avatarUrl,
-      password: user.password,
-      refreshToken: user.refreshToken,
-    };
-  }
+  @ApiPropertyOptional({ type: () => [ArticleDetailDto] })
+  articles?: ArticleDetailDto[];
+
+  @ApiPropertyOptional()
+  refreshToken: string | null;
+}
+
+export class UserListDto extends UserBaseDto {
+  @ApiPropertyOptional()
+  @IsUrl()
+  avatarUrl?: string;
+
+  @ApiPropertyOptional({ type: () => [ArticleDetailDto] })
+  articles?: ArticleDetailDto[];
+}
+
+export class UserInternalDto extends UserDetailDto {
+  password: string;
+}
+
+export class CreateUserDto {
+  displayName: string;
+  email: string;
+  password: string;
+  avatarUrl?: string;
 }

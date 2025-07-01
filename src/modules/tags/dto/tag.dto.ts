@@ -1,22 +1,29 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsUUID } from 'class-validator';
 
-import { TagEntity } from '@/entities';
+import { ArticleDetailDto } from '@/modules/articles/dto';
 
-export class TagResponseDto {
-  @ApiProperty({ example: 'tag-1' })
+class TagBaseDto {
+  @ApiProperty()
+  @IsUUID()
   id: string;
 
-  @ApiProperty({ example: 'NestJS' })
+  @ApiProperty()
   name: string;
+}
 
-  static fromEntity(tag: TagEntity): TagResponseDto {
-    return {
-      id: tag.id,
-      name: tag.name,
-    };
-  }
+export class TagDetailDto extends TagBaseDto {
+  @ApiProperty({ type: () => [ArticleDetailDto] })
+  articles: ArticleDetailDto[];
+}
 
-  static fromEntities(tags: TagEntity[]): TagResponseDto[] {
-    return tags.map((tag) => TagResponseDto.fromEntity(tag));
-  }
+export class TagListDto extends TagBaseDto {
+  @ApiProperty({ type: () => [ArticleDetailDto] })
+  articles: ArticleDetailDto[];
+}
+
+export class CreateTagDto {
+  @ApiProperty()
+  @IsNotEmpty()
+  name: string;
 }

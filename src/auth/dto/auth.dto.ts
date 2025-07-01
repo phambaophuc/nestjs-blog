@@ -1,7 +1,7 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsOptional, MinLength } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
 
-import { UserResponseDto } from '@/modules/users/dto';
+import { UserDetailResponse } from '@/modules/users';
 
 export class SignInDto {
   @ApiProperty()
@@ -19,8 +19,8 @@ export class SignInResponseDto {
   @ApiProperty()
   accessToken: string;
 
-  @ApiProperty()
-  user: UserResponseDto;
+  @ApiProperty({ type: () => UserDetailResponse })
+  user: UserDetailResponse;
 }
 
 export class SignUpDto {
@@ -38,8 +38,7 @@ export class SignUpDto {
   @IsNotEmpty({ message: 'Password is required' })
   password: string;
 
-  @ApiProperty()
-  @IsOptional()
+  @ApiPropertyOptional()
   avatarUrl?: string;
 }
 

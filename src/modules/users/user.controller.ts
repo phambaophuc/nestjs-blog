@@ -9,7 +9,7 @@ import {
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 
-import { UserResponseDto } from './dto';
+import { UserDetailResponse, UserListResponse } from './dto';
 import { UserService } from './user.service';
 
 @ApiTags('UserController')
@@ -18,14 +18,14 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
-  @ApiOkResponse({ type: [UserResponseDto] })
-  public async findAll(): Promise<UserResponseDto[]> {
+  @ApiOkResponse({ type: [UserListResponse] })
+  public async findAll(): Promise<UserListResponse[]> {
     return this.userService.findAll();
   }
 
   @Get(':id')
-  @ApiOkResponse({ type: UserResponseDto })
-  public async findById(@Param('id') id: string): Promise<UserResponseDto> {
+  @ApiOkResponse({ type: UserDetailResponse })
+  public async findById(@Param('id') id: string): Promise<UserDetailResponse> {
     return this.userService.findById(id);
   }
 

@@ -10,9 +10,10 @@ import { HtmlUtilsService } from '@/shared';
 import { TagService } from '../tags';
 import { ArticleRepository } from './article.repository';
 import {
-  ArticleResponseDto,
+  ArticleDetailResponse,
+  ArticleListResponse,
+  ArticleMapper,
   CreateArticleDto,
-  GetArticlesResponseDto,
   QueryArticleDto,
 } from './dto';
 
@@ -26,7 +27,7 @@ export class ArticleService {
     private readonly htmlUtilsService: HtmlUtilsService,
   ) {}
 
-  async findAll(query: QueryArticleDto): Promise<GetArticlesResponseDto> {
+  async findAll(query: QueryArticleDto): Promise<ArticleListResponse> {
     try {
       const { page = 1, limit = 10 } = query;
 
@@ -40,7 +41,7 @@ export class ArticleService {
         await this.articleRepo.findWithFiltersAndPagination(pagination);
 
       return {
-        data: ArticleResponseDto.fromEntities(articles),
+        data: ArticleMapper.toLists(articles),
         limit: pagination.limit,
         page: pagination.page,
         totalPages: Math.ceil(total / pagination.limit),
@@ -60,7 +61,7 @@ export class ArticleService {
     }
   }
 
-  async findBySlug(slug: string): Promise<ArticleResponseDto> {
+  async findBySlug(slug: string): Promise<ArticleDetailResponse> {
     try {
       const article = await this.articleRepo.findBySlug(slug);
 
@@ -69,7 +70,7 @@ export class ArticleService {
       }
       this.incrementViewsAsync(article.id);
 
-      return ArticleResponseDto.fromEntity(article);
+      return ArticleMapper.toDetail(article);
     } catch (error) {
       this.logger.error(
         `Error finding article ${slug}: ${error.message}`,
@@ -84,7 +85,7 @@ export class ArticleService {
     }
   }
 
-  async findById(id: string): Promise<ArticleResponseDto> {
+  async findById(id: string): Promise<ArticleDetailResponse> {
     try {
       const article = await this.articleRepo.findById(id);
 
@@ -92,7 +93,7 @@ export class ArticleService {
         throw new NotFoundException(`Article with ID ${id} not found`);
       }
 
-      return ArticleResponseDto.fromEntity(article);
+      return ArticleMapper.toDetail(article);
     } catch (error) {
       this.logger.error(
         `Error finding article ${id}: ${error.message}`,
@@ -110,7 +111,7 @@ export class ArticleService {
   async create(
     createArticleDto: CreateArticleDto,
     userId: string,
-  ): Promise<ArticleResponseDto> {
+  ): Promise<ArticleDetailResponse> {
     try {
       const { content, title } = createArticleDto;
 
@@ -142,7 +143,7 @@ export class ArticleService {
 
       const article = await this.articleRepo.store(articleData);
 
-      return ArticleResponseDto.fromEntity(article);
+      return ArticleMapper.toDetail(article);
     } catch (error) {
       this.logger.error(
         `Error creating article: ${error.message}`,

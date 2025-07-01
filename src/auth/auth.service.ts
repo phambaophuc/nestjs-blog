@@ -8,7 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { compare, hash } from 'bcrypt';
 import { Request, Response } from 'express';
 
-import { UserResponseDto, UserService } from '@/modules/users';
+import { UserService } from '@/modules/users';
 
 import {
   SignInDto,
@@ -101,7 +101,7 @@ export class AuthService {
 
     return {
       accessToken,
-      user: UserResponseDto.fromEntity(user),
+      user: await this.userService.findById(user.id),
     };
   }
 

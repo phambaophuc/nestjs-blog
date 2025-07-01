@@ -1,12 +1,11 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { IsInt, IsNotEmpty, Min } from 'class-validator';
 
-import { PaginatedResponseDto } from '@/common';
-import { ArticleEntity } from '@/entities';
-import { CommentResponseDto } from '@/modules/comments/dto';
-import { UserResponseDto } from '@/modules/users/dto';
+import { CommentDetailDto } from '@/modules/comments/dto';
+import { UserDetailDto } from '@/modules/users';
 
-export class ArticleResponseDto {
+class ArticleBaseDto {
   @ApiProperty()
   id: string;
 
@@ -16,15 +15,18 @@ export class ArticleResponseDto {
   @ApiProperty()
   slug: string;
 
-  @ApiProperty({ nullable: true })
-  @IsOptional()
+  @ApiProperty()
+  createdAt: Date;
+}
+
+export class ArticleDetailDto extends ArticleBaseDto {
+  @ApiPropertyOptional()
   excerpt?: string;
 
   @ApiProperty()
   content: string;
 
-  @ApiProperty({ nullable: true })
-  @IsOptional()
+  @ApiPropertyOptional()
   coverImageUrl?: string;
 
   @ApiProperty()
@@ -34,42 +36,54 @@ export class ArticleResponseDto {
   readingTime: number;
 
   @ApiProperty()
-  createdAt: Date;
+  tags: string[];
+
+  @ApiPropertyOptional({ type: () => UserDetailDto })
+  author?: UserDetailDto;
+
+  @ApiPropertyOptional({ type: () => [CommentDetailDto] })
+  comments?: CommentDetailDto[];
+}
+
+export class ArticleListDto extends ArticleBaseDto {
+  @ApiPropertyOptional()
+  excerpt?: string;
+
+  @ApiPropertyOptional()
+  coverImageUrl?: string;
+
+  @ApiProperty()
+  viewsCount: number;
+
+  @ApiProperty()
+  readingTime: number;
 
   @ApiProperty()
   tags: string[];
 
-  @ApiProperty({ type: () => UserResponseDto })
-  @IsOptional()
-  author?: UserResponseDto;
-
-  @ApiProperty({ type: () => [CommentResponseDto] })
-  comments: CommentResponseDto[];
-
-  static fromEntity(article: ArticleEntity): ArticleResponseDto {
-    return {
-      id: article.id,
-      title: article.title,
-      slug: article.slug,
-      excerpt: article.excerpt,
-      content: article.content,
-      coverImageUrl: article.coverImageUrl,
-      viewsCount: article.viewsCount,
-      readingTime: article.readingTime,
-      createdAt: article.createdAt,
-      tags: article.tags.map((tag) => tag.name),
-      author: article.author
-        ? UserResponseDto.fromEntity(article.author)
-        : undefined,
-      comments: article.comments
-        ? CommentResponseDto.fromEntities(article.comments)
-        : [],
-    };
-  }
-
-  static fromEntities(articles: ArticleEntity[]): ArticleResponseDto[] {
-    return articles.map((article) => ArticleResponseDto.fromEntity(article));
-  }
+  @ApiPropertyOptional({ type: () => UserDetailDto })
+  author?: UserDetailDto;
 }
 
-export class GetArticlesResponseDto extends PaginatedResponseDto<ArticleResponseDto> {}
+export class CreateArticleDto {
+  @ApiProperty()
+  @IsNotEmpty()
+  title: string;
+
+  @ApiPropertyOptional()
+  content: string;
+}
+
+export class QueryArticleDto {
+  @ApiPropertyOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  page?: number = 1;
+
+  @ApiPropertyOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  limit?: number = 10;
+}

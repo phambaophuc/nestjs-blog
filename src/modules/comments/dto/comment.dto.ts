@@ -1,42 +1,58 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
 
-import { CommentEntity } from '@/entities';
-import { UserResponseDto } from '@/modules/users/dto';
+import { UserDetailDto } from '@/modules/users';
 
-export class CommentResponseDto {
+class CommentBaseDto {
   @ApiProperty()
+  @IsUUID()
   id: string;
 
   @ApiProperty()
   content: string;
 
   @ApiProperty()
-  @IsOptional()
+  createdAt: Date;
+}
+
+export class CommentDetailDto extends CommentBaseDto {
+  @ApiPropertyOptional()
+  @IsUUID()
   parentId?: string;
 
+  @ApiPropertyOptional({ type: () => UserDetailDto })
+  user?: UserDetailDto;
+
+  @ApiPropertyOptional({ type: () => [CommentDetailDto], nullable: true })
+  replies?: CommentDetailDto[];
+}
+
+export class CommentListDto extends CommentBaseDto {
+  @ApiPropertyOptional()
+  @IsUUID()
+  parentId?: string;
+
+  @ApiPropertyOptional({ type: () => UserDetailDto })
+  user?: UserDetailDto;
+
+  @ApiPropertyOptional({ type: () => [CommentDetailDto], nullable: true })
+  replies?: CommentDetailDto[];
+
   @ApiProperty()
-  createdAt: Date;
+  repliesCount: number;
+}
 
-  @ApiProperty({ type: () => UserResponseDto })
-  user: UserResponseDto;
+export class CreateCommentDto {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  content: string;
 
-  @ApiProperty({ type: () => [CommentResponseDto], nullable: true })
-  @IsOptional()
-  replies?: CommentResponseDto[];
+  @ApiProperty()
+  @IsUUID()
+  articleId: string;
 
-  static fromEntity(comment: CommentEntity): CommentResponseDto {
-    return {
-      id: comment.id,
-      content: comment.content,
-      parentId: comment.parentId,
-      createdAt: comment.createdAt,
-      user: UserResponseDto.fromEntity(comment.user),
-      replies: comment.replies ?? [],
-    };
-  }
-
-  static fromEntities(comments: CommentEntity[]): CommentResponseDto[] {
-    return comments.map((comment) => CommentResponseDto.fromEntity(comment));
-  }
+  @ApiPropertyOptional({ required: false })
+  @IsUUID()
+  parentId?: string;
 }

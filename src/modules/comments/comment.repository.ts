@@ -4,8 +4,6 @@ import { IsNull, Repository } from 'typeorm';
 
 import { CommentEntity } from '@/entities';
 
-import { CreateCommentDto } from './dto';
-
 @Injectable()
 export class CommentRepository {
   constructor(
@@ -28,12 +26,8 @@ export class CommentRepository {
     });
   }
 
-  async store(comment: CreateCommentDto): Promise<CommentEntity> {
-    const newComment = this.repo.create({
-      ...comment,
-      article: { id: comment.articleId },
-      user: { id: comment.userId },
-    });
+  async store(comment: Partial<CommentEntity>): Promise<CommentEntity> {
+    const newComment = this.repo.create(comment);
     return this.repo.save(newComment);
   }
 
