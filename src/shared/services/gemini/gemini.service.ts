@@ -1,6 +1,11 @@
 import { GenerativeModel, GoogleGenerativeAI } from '@google/generative-ai';
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { JSDOM } from 'jsdom';
 import LanguageDetect from 'languagedetect';
 
 import { AppConfig } from '@/config';
@@ -15,6 +20,8 @@ export interface GeneratedTags {
 
 @Injectable()
 export class GeminiService {
+  private readonly logger = new Logger(GeminiService.name);
+
   private readonly genAI: GoogleGenerativeAI;
   private readonly model: GenerativeModel;
   private readonly langDetect = new LanguageDetect();
@@ -70,7 +77,7 @@ export class GeminiService {
     maxTags: number = 4,
   ): Promise<GeneratedTags> {
     try {
-      const cleanedContent = content?.trim();
+      const cleanedContent = this.stripHtml(content).trim();
       if (!cleanedContent) {
         throw new Error('Input content cannot be empty');
       }
@@ -84,31 +91,30 @@ export class GeminiService {
 
       const prompt = `
         You're an AI tag generator. Follow these STRICT rules:
-  
-        1. FIRST select ONE primary category from this EXACT list (DO NOT INVENT NEW CATEGORIES):
+
+        1. Select ONE primary category from this EXACT list (DO NOT INVENT NEW TAGS):
         [${categoriesStr}]
-        
-        2. THEN generate up to ${maxTags} tags that:
-          - Are DIRECTLY RELATED to the selected category
-          - Would appear in a subcategory of the selected category
-          - Are COMMONLY USED terms in that field
+
+        2. Generate up to ${maxTags} tags that:
+          - MUST be selected ONLY from the above list (NO EXTERNAL TAGS)
+          - MUST be relevant subtopics, alternate names, or closely associated concepts that are ALREADY PRESENT in the list
           - Are 1-3 words only
-          
+
         3. STRICTLY PROHIBITED:
-          - Tags unrelated to selected category
-          - Tags from other categories
-          - Invented/new terms not in common usage
-        
+          - Tags not found in the list above
+          - Invented or uncommon terms
+          - Tags from outside the provided list
+
         Content: """${inputContent}"""
-        
+
         Format your response as JSON:
         {
-          "category": "primary_category",
-          "tags": ["tag1", "tag2", "tag3"],
-          "confidence": "high|medium|low"
+          "category": "selected_category_from_list",
+          "tags": ["tag1_from_list", "tag2_from_list"],
+          "confidence": "high" | "medium" | "low"
         }
-        
-        Return only the JSON response.
+
+        Return ONLY the JSON response.
       `;
 
       const result = await this.model.generateContent(prompt);
@@ -162,7 +168,7 @@ export class GeminiService {
         confidence: parsedResponse.confidence || 'medium',
       };
     } catch (error) {
-      console.error('Error generating tags:', error);
+      this.logger.error('Error generating tags', error.message);
       throw new InternalServerErrorException('Failed to generate tags');
     }
   }
@@ -183,5 +189,10 @@ export class GeminiService {
     }
 
     return tags.filter((tag) => tag.length > 0 && tag.length < 50);
+  }
+
+  private stripHtml(html: string): string {
+    const dom = new JSDOM(html);
+    return dom.window.document.body.textContent || '';
   }
 }

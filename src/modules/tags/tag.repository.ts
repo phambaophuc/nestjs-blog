@@ -26,18 +26,21 @@ export class TagRepository {
   }
 
   async findTrendingTags(): Promise<TagEntity[]> {
-    const subQuery = this.repo
-      .createQueryBuilder('tag')
-      .leftJoin('tag.articles', 'article')
-      .groupBy('tag.id')
-      .having('COUNT(article.id) > :minArticles', { minArticles: 2 })
-      .select('tag.id');
-
     return this.repo
       .createQueryBuilder('tag')
       .leftJoinAndSelect('tag.articles', 'article')
-      .where(`tag.id IN (${subQuery.getQuery()})`)
-      .setParameters(subQuery.getParameters())
+      .select([
+        'tag.id',
+        'tag.name',
+        'article.id',
+        'article.title',
+        'article.slug',
+        'article.createdAt',
+      ])
+      .groupBy('tag.id')
+      .addGroupBy('article.id')
+      .orderBy('COUNT(article.id)', 'DESC')
+      .limit(5)
       .getMany();
   }
 
