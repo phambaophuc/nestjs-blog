@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import pLimit from 'p-limit';
 
 import { ArticleService } from '../articles';
 import { CrawlerService } from '../crawler';
@@ -10,7 +11,7 @@ import { RssItem } from './types';
 export class RssScheduler {
   private readonly logger = new Logger(RssScheduler.name);
   private isRunning = false;
-  private readonly FEED_URL = 'https://dev.to/feed';
+  private readonly FEED_URLS = ['https://dev.to/feed'];
   private readonly USER_ID = '4bb5e8a6-342e-4a98-9f12-cc5d0283bb85';
 
   constructor(
@@ -31,15 +32,26 @@ export class RssScheduler {
     this.logger.log(`⏳ Starting RSS crawl...`);
 
     try {
-      const { items } = await this.rssService.crawlRssFeed(this.FEED_URL);
+      const crawlResults = await this.rssService.crawlMultipleFeeds(
+        this.FEED_URLS,
+      );
 
-      if (!items?.length) {
+      if (!crawlResults.length) {
         this.logger.warn('No items found in RSS feed.');
         return;
       }
 
-      await this.processFeed(items);
-      this.logger.log(`📊 Processed ${items.length} items from RSS feed.`);
+      await Promise.all(
+        crawlResults.map(async (result) => {
+          const { feed } = result;
+          if (feed) {
+            await this.processFeed(feed.items);
+            this.logger.log(
+              `📊 Processed ${feed.items.length} items from RSS feed.`,
+            );
+          }
+        }),
+      );
     } catch (error) {
       this.logger.error(
         'Error in scheduled RSS crawl:',
@@ -54,18 +66,23 @@ export class RssScheduler {
   }
 
   private async processFeed(items: RssItem[]) {
+    const limit = pLimit(5);
+
     await Promise.all(
-      items.map(async (item) => {
-        const { link } = item;
-        const { title, content } = await this.crawlerService.crawlArticle(link);
-        await this.articleService.createIfNotExists(
-          {
-            title,
-            content,
-          },
-          this.USER_ID,
-        );
-      }),
+      items.map(async (item) =>
+        limit(async () => {
+          const { title, content } = await this.crawlerService.crawlArticle(
+            item.link,
+          );
+          await this.articleService.createIfNotExists(
+            {
+              title,
+              content,
+            },
+            this.USER_ID,
+          );
+        }),
+      ),
     );
   }
 }

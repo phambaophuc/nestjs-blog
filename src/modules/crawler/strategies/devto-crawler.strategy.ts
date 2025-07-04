@@ -60,11 +60,6 @@ export class DevToCrawlerStrategy implements CrawlerStrategy {
 
     const cleanHtml = $.html();
 
-    return cleanHtml
-      .replace(/[\n\r\t]/g, ' ')
-      .replace(/\s+/g, ' ')
-      .replace(/>\s+</g, '><')
-      .replace(/\\"/g, '"')
-      .trim();
+    return cleanHtml.replace(/\\"/g, '"').trim();
   }
 }

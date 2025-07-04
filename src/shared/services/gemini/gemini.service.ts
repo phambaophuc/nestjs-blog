@@ -13,9 +13,7 @@ import { AppConfig } from '@/config';
 const MAX_INPUT_LENGTH = 4000;
 
 export interface GeneratedTags {
-  category: string;
   tags: string[];
-  confidence: 'high' | 'medium' | 'low';
 }
 
 @Injectable()
@@ -90,31 +88,35 @@ export class GeminiService {
       const categoriesStr = categories.join(', ');
 
       const prompt = `
-        You're an AI tag generator. Follow these STRICT rules:
+        You are an AI tag generator. Follow these STRICT rules:
 
-        1. Select ONE primary category from this EXACT list (DO NOT INVENT NEW TAGS):
+        1. You MUST choose ONE AND ONLY ONE primary category from this EXACT list (DO NOT invent, rephrase, or create new values):
         [${categoriesStr}]
 
-        2. Generate up to ${maxTags} tags that:
-          - MUST be selected ONLY from the above list (NO EXTERNAL TAGS)
-          - MUST be relevant subtopics, alternate names, or closely associated concepts that are ALREADY PRESENT in the list
-          - Are 1-3 words only
+        2. Generate up to ${maxTags} tags that meet ALL of the following criteria:
+          - MUST be selected ONLY from the list above
+          - MUST be existing items (NO new inventions, synonyms, or paraphrasing)
+          - MUST be relevant subtopics, alternate names, or closely associated concepts already present in the list
+          - Each tag must be 1–3 words max
 
         3. STRICTLY PROHIBITED:
-          - Tags not found in the list above
-          - Invented or uncommon terms
-          - Tags from outside the provided list
+          - Tags NOT found in the list above
+          - Creating new tags, paraphrased versions, or uncommon terms
+          - External terminology not explicitly listed
 
-        Content: """${inputContent}"""
+        4. You MUST base your tag selection ONLY on the provided content below.
 
-        Format your response as JSON:
+        Content:
+        """
+        ${inputContent}
+        """
+
+        Respond in this exact JSON format:
         {
-          "category": "selected_category_from_list",
-          "tags": ["tag1_from_list", "tag2_from_list"],
-          "confidence": "high" | "medium" | "low"
+          "tags": ["tag1_from_list", "tag2_from_list", ...]
         }
 
-        Return ONLY the JSON response.
+        Return ONLY the JSON. Do not explain or comment.
       `;
 
       const result = await this.model.generateContent(prompt);
@@ -138,9 +140,7 @@ export class GeminiService {
         // Fallback if JSON parsing fails
         const tags = this.extractTagsFromText(responseText);
         parsedResponse = {
-          category: categories[0],
           tags: tags.slice(0, maxTags),
-          confidence: 'medium',
         };
       }
 
@@ -157,15 +157,8 @@ export class GeminiService {
         throw new Error('No valid tags generated');
       }
 
-      // Ensure category is valid
-      const category = categories.includes(parsedResponse.category)
-        ? parsedResponse.category
-        : categories[0];
-
       return {
-        category,
         tags: validTags,
-        confidence: parsedResponse.confidence || 'medium',
       };
     } catch (error) {
       this.logger.error('Error generating tags', error.message);
