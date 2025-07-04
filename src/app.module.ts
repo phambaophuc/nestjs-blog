@@ -6,6 +6,8 @@ import { AuthModule } from './auth';
 import { configuration, getTypeOrmConfig } from './config';
 import { ArticleModule } from './modules/articles';
 import { CommentModule } from './modules/comments';
+import { CrawlerModule } from './modules/crawler';
+import { RssModule } from './modules/rss';
 import { StorageModule } from './modules/storage';
 import { SubscriberModule } from './modules/subscribers';
 import { TagModule } from './modules/tags';
@@ -28,6 +30,8 @@ import { UserModule } from './modules/users';
     SubscriberModule,
     TagModule,
     UserModule,
+    RssModule,
+    CrawlerModule,
   ],
 })
 export class AppModule {}

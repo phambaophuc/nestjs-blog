@@ -11,21 +11,32 @@ import { CreateTagDto, TagMapper } from './dto';
 import { TagDetailResponse, TagListResponse } from './dto/responses.dto';
 import { TagRepository } from './tag.repository';
 
-const categories = [
+const tags = [
   'Web Development',
-  'Programming',
+  'Frontend',
+  'Backend',
+  'Fullstack',
   'UI/UX Design',
   'Database',
+  'NoSQL',
+  'SQL',
   'DevOps',
+  'Docker',
+  'CI/CD',
+  'Cloud',
+  'AWS',
+  'Software Architecture',
+  'Version Control',
   'Git',
-  'AI Tools',
-  'Machine Learning',
-  'Prompt Engineering',
-  'ChatGPT',
-  'Automation',
   'Open Source',
-  'Side Project',
   'Startup',
+  'Automation',
+  'AI',
+  'Machine Learning',
+  'ChatGPT',
+  'Tech Career',
+  'Interview Prep',
+  'Productivity Tools',
 ];
 
 @Injectable()
@@ -83,11 +94,7 @@ export class TagService {
   }
 
   async generateTagsAndSave(content: string): Promise<TagEntity[]> {
-    const result = await this.geminiService.generateTags(
-      content,
-      categories,
-      4,
-    );
+    const result = await this.geminiService.generateTags(content, tags, 4);
     return this.repo.handleTags(result.tags);
   }
 }

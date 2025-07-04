@@ -5,7 +5,13 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
-import { HtmlUtilsService } from '@/shared';
+import { ArticleEntity } from '@/entities';
+import {
+  calculateReadingTime,
+  generateExcerpt,
+  HtmlUtilsService,
+  slugify,
+} from '@/shared';
 
 import { TagService } from '../tags';
 import { ArticleRepository } from './article.repository';
@@ -109,39 +115,15 @@ export class ArticleService {
   }
 
   async create(
-    createArticleDto: CreateArticleDto,
-    userId: string,
+    dto: CreateArticleDto,
+    authorId: string,
   ): Promise<ArticleDetailResponse> {
     try {
-      const { content, title } = createArticleDto;
-
-      if (!content?.trim()) {
-        throw new BadRequestException('Article content is required');
-      }
-
-      if (!title?.trim()) {
-        throw new BadRequestException('Article title is required');
-      }
-
-      const [slug, excerpt, imageUrl, readingTime, tags] = await Promise.all([
-        this.generateSlug(title),
-        this.generateExcerpt(content),
-        this.extractImageUrl(content),
-        this.calculateReadingTime(content),
-        this.tagService.generateTagsAndSave(content),
-      ]);
-
-      const articleData = {
-        ...createArticleDto,
-        slug,
-        excerpt,
-        coverImageUrl: imageUrl ?? undefined,
-        readingTime,
-        tags,
-        authorId: userId,
-      };
-
-      const article = await this.articleRepo.store(articleData);
+      const articleData = await this.handleArticle(dto);
+      const article = await this.articleRepo.store({
+        ...articleData,
+        authorId,
+      });
 
       return ArticleMapper.toDetail(article);
     } catch (error) {
@@ -158,12 +140,59 @@ export class ArticleService {
     }
   }
 
+  async createIfNotExists(
+    dto: CreateArticleDto,
+    authorId: string,
+  ): Promise<boolean> {
+    const slug = slugify(dto.title);
+    const exists = await this.articleRepo.findBySlug(slug);
+
+    if (!exists) {
+      const article = await this.handleArticle(dto);
+      await this.articleRepo.store({ ...article, authorId });
+      return true;
+    }
+
+    return false;
+  }
+
   async delete(id: string): Promise<void> {
     try {
       return await this.articleRepo.destroy(id);
     } catch (error) {
       throw new BadRequestException(error.message);
     }
+  }
+
+  private async handleArticle(
+    dto: CreateArticleDto,
+  ): Promise<Partial<ArticleEntity>> {
+    const { content, title } = dto;
+
+    if (!content?.trim()) {
+      throw new BadRequestException('Article content is required');
+    }
+
+    if (!title?.trim()) {
+      throw new BadRequestException('Article title is required');
+    }
+
+    const [slug, excerpt, imageUrl, readingTime, tags] = await Promise.all([
+      slugify(title),
+      generateExcerpt(content),
+      this.extractImageUrl(content),
+      calculateReadingTime(content),
+      this.tagService.generateTagsAndSave(content),
+    ]);
+
+    return {
+      ...dto,
+      slug,
+      excerpt,
+      coverImageUrl: imageUrl ?? undefined,
+      readingTime,
+      tags,
+    };
   }
 
   private async incrementViewsAsync(id: string): Promise<void> {
@@ -176,48 +205,6 @@ export class ArticleService {
     }
   }
 
-  private generateSlug(title: string): string {
-    return title
-      .toLowerCase()
-      .replace(/[^\w\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/--+/g, '-')
-      .trim();
-  }
-
-  private generateExcerpt(content: string, maxLength = 140): string {
-    if (!content) return '';
-
-    let text = content
-      .replace(/<(script|style)[^>]*>[\s\S]*?<\/(script|style)>/gi, '')
-      .replace(/<[^>]+>/g, ' ')
-      .replace(/&[^;]+;/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim();
-
-    const lines = text.split('\n').filter((l) => l.trim());
-    if (lines.length > 1 && lines[0].length < 80 && !/[.!?]$/.test(lines[0])) {
-      text = lines.slice(1).join(' ');
-    }
-
-    const sentences = text.split(/[.!?]+/).filter((s) => s.trim().length > 10);
-    let result = '';
-
-    for (const sentence of sentences) {
-      const clean = sentence.trim();
-      if (result.length + clean.length > maxLength) break;
-      result += (result ? '. ' : '') + clean;
-      if (result.length >= maxLength * 0.8) break;
-    }
-
-    if (!result) {
-      result = text.slice(0, maxLength).trim();
-      if (!/[.!?]$/.test(result)) result += '...';
-    }
-
-    return result;
-  }
-
   private extractImageUrl(content: string): string | null {
     try {
       return this.htmlUtilsService.extractFirstImage(content);
@@ -225,11 +212,5 @@ export class ArticleService {
       this.logger.warn(`Failed to extract image URL: ${error.message}`);
       return null;
     }
-  }
-
-  private calculateReadingTime(content: string): number {
-    const wordsPerMinute = 200;
-    const wordCount = content.split(/\s+/).length;
-    return Math.ceil(wordCount / wordsPerMinute);
   }
 }

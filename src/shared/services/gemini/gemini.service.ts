@@ -1,6 +1,11 @@
 import { GenerativeModel, GoogleGenerativeAI } from '@google/generative-ai';
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { JSDOM } from 'jsdom';
 import LanguageDetect from 'languagedetect';
 
 import { AppConfig } from '@/config';
@@ -8,13 +13,13 @@ import { AppConfig } from '@/config';
 const MAX_INPUT_LENGTH = 4000;
 
 export interface GeneratedTags {
-  category: string;
   tags: string[];
-  confidence: 'high' | 'medium' | 'low';
 }
 
 @Injectable()
 export class GeminiService {
+  private readonly logger = new Logger(GeminiService.name);
+
   private readonly genAI: GoogleGenerativeAI;
   private readonly model: GenerativeModel;
   private readonly langDetect = new LanguageDetect();
@@ -70,7 +75,7 @@ export class GeminiService {
     maxTags: number = 4,
   ): Promise<GeneratedTags> {
     try {
-      const cleanedContent = content?.trim();
+      const cleanedContent = this.stripHtml(content).trim();
       if (!cleanedContent) {
         throw new Error('Input content cannot be empty');
       }
@@ -83,32 +88,35 @@ export class GeminiService {
       const categoriesStr = categories.join(', ');
 
       const prompt = `
-        You're an AI tag generator. Follow these STRICT rules:
-  
-        1. FIRST select ONE primary category from this EXACT list (DO NOT INVENT NEW CATEGORIES):
+        You are an AI tag generator. Follow these STRICT rules:
+
+        1. You MUST choose ONE AND ONLY ONE primary category from this EXACT list (DO NOT invent, rephrase, or create new values):
         [${categoriesStr}]
-        
-        2. THEN generate up to ${maxTags} tags that:
-          - Are DIRECTLY RELATED to the selected category
-          - Would appear in a subcategory of the selected category
-          - Are COMMONLY USED terms in that field
-          - Are 1-3 words only
-          
+
+        2. Generate up to ${maxTags} tags that meet ALL of the following criteria:
+          - MUST be selected ONLY from the list above
+          - MUST be existing items (NO new inventions, synonyms, or paraphrasing)
+          - MUST be relevant subtopics, alternate names, or closely associated concepts already present in the list
+          - Each tag must be 1–3 words max
+
         3. STRICTLY PROHIBITED:
-          - Tags unrelated to selected category
-          - Tags from other categories
-          - Invented/new terms not in common usage
-        
-        Content: """${inputContent}"""
-        
-        Format your response as JSON:
+          - Tags NOT found in the list above
+          - Creating new tags, paraphrased versions, or uncommon terms
+          - External terminology not explicitly listed
+
+        4. You MUST base your tag selection ONLY on the provided content below.
+
+        Content:
+        """
+        ${inputContent}
+        """
+
+        Respond in this exact JSON format:
         {
-          "category": "primary_category",
-          "tags": ["tag1", "tag2", "tag3"],
-          "confidence": "high|medium|low"
+          "tags": ["tag1_from_list", "tag2_from_list", ...]
         }
-        
-        Return only the JSON response.
+
+        Return ONLY the JSON. Do not explain or comment.
       `;
 
       const result = await this.model.generateContent(prompt);
@@ -132,9 +140,7 @@ export class GeminiService {
         // Fallback if JSON parsing fails
         const tags = this.extractTagsFromText(responseText);
         parsedResponse = {
-          category: categories[0],
           tags: tags.slice(0, maxTags),
-          confidence: 'medium',
         };
       }
 
@@ -151,18 +157,11 @@ export class GeminiService {
         throw new Error('No valid tags generated');
       }
 
-      // Ensure category is valid
-      const category = categories.includes(parsedResponse.category)
-        ? parsedResponse.category
-        : categories[0];
-
       return {
-        category,
         tags: validTags,
-        confidence: parsedResponse.confidence || 'medium',
       };
     } catch (error) {
-      console.error('Error generating tags:', error);
+      this.logger.error('Error generating tags', error.message);
       throw new InternalServerErrorException('Failed to generate tags');
     }
   }
@@ -183,5 +182,10 @@ export class GeminiService {
     }
 
     return tags.filter((tag) => tag.length > 0 && tag.length < 50);
+  }
+
+  private stripHtml(html: string): string {
+    const dom = new JSDOM(html);
+    return dom.window.document.body.textContent || '';
   }
 }
