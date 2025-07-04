@@ -70,7 +70,8 @@ export class CreateArticleDto {
   @IsNotEmpty()
   title: string;
 
-  @ApiPropertyOptional()
+  @ApiProperty()
+  @IsNotEmpty()
   content: string;
 }
 

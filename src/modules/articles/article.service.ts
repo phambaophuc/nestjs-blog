@@ -145,15 +145,20 @@ export class ArticleService {
     authorId: string,
   ): Promise<boolean> {
     const slug = slugify(dto.title);
-    const exists = await this.articleRepo.findBySlug(slug);
 
-    if (!exists) {
-      const article = await this.handleArticle(dto);
-      await this.articleRepo.store({ ...article, authorId });
-      return true;
+    try {
+      const exists = await this.articleRepo.findBySlug(slug);
+
+      if (!exists) {
+        const article = await this.handleArticle(dto);
+        await this.articleRepo.store({ ...article, authorId });
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      throw new Error('Unable to create article', error.message);
     }
-
-    return false;
   }
 
   async delete(id: string): Promise<void> {

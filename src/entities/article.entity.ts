@@ -29,7 +29,7 @@ export class ArticleEntity extends BaseEntity {
   @Column({ type: 'text', nullable: true })
   excerpt?: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'text', nullable: false })
   content: string;
 
   @Column({ nullable: true })

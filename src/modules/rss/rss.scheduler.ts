@@ -1,6 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import promiseLimit from 'promise-limit';
 
 import { ArticleService } from '../articles';
 import { CrawlerService } from '../crawler';
@@ -20,7 +19,7 @@ export class RssScheduler {
     private readonly crawlerService: CrawlerService,
   ) {}
 
-  @Cron(CronExpression.EVERY_30_MINUTES)
+  @Cron(CronExpression.EVERY_10_MINUTES)
   async crawlScheduledFeeds(): Promise<void> {
     if (this.isRunning) {
       this.logger.warn('⚠️ RSS crawl skipped: previous job still running.');
@@ -47,7 +46,7 @@ export class RssScheduler {
           if (feed) {
             await this.processFeed(feed.items);
             this.logger.log(
-              `📊 Processed ${feed.items.length} items from RSS feed.`,
+              `📊 Processed ${feed.items.length} items from ${feed.title || 'RSS feed'}.`,
             );
           }
         }),
@@ -65,21 +64,27 @@ export class RssScheduler {
     }
   }
 
-  private async processFeed(items: RssItem[]) {
-    const limit = promiseLimit(5);
+  private async processFeed(items: RssItem[]): Promise<void> {
+    for (const item of items) {
+      try {
+        const { title, content } = await this.crawlerService.crawlArticle(
+          item.link,
+        );
 
-    await Promise.all(
-      items.map((item) =>
-        limit(async () => {
-          const { title, content } = await this.crawlerService.crawlArticle(
-            item.link,
-          );
-          await this.articleService.createIfNotExists(
-            { title, content },
-            this.USER_ID,
-          );
-        }),
-      ),
-    );
+        const isCreated = await this.articleService.createIfNotExists(
+          { title, content },
+          this.USER_ID,
+        );
+
+        if (!isCreated) {
+          this.logger.debug(`Duplicate found at ${item.link}, stopping crawl.`);
+          break;
+        }
+
+        this.logger.log(`Created article: ${item.link}`);
+      } catch (error) {
+        this.logger.warn(`Failed to process item: ${item.link}`, error.stack);
+      }
+    }
   }
 }
