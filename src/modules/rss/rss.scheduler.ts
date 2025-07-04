@@ -20,7 +20,7 @@ export class RssScheduler {
     private readonly crawlerService: CrawlerService,
   ) {}
 
-  @Cron(CronExpression.EVERY_5_MINUTES)
+  @Cron(CronExpression.EVERY_30_MINUTES)
   async crawlScheduledFeeds(): Promise<void> {
     if (this.isRunning) {
       this.logger.warn('⚠️ RSS crawl skipped: previous job still running.');
