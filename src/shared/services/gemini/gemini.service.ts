@@ -145,7 +145,7 @@ export class GeminiService {
       }
 
       // Validate and clean tags
-      const validTags =
+      let validTags =
         parsedResponse.tags
           ?.filter(
             (tag) => tag && typeof tag === 'string' && tag.trim().length > 0,
@@ -154,7 +154,12 @@ export class GeminiService {
           ?.slice(0, maxTags) || [];
 
       if (validTags.length === 0) {
-        throw new Error('No valid tags generated');
+        const fallbackTags = this.extractTagsFromText(responseText);
+        validTags = fallbackTags
+          .filter((tag) =>
+            categories.map((c) => c.toLowerCase()).includes(tag.toLowerCase()),
+          )
+          .slice(0, maxTags);
       }
 
       return {

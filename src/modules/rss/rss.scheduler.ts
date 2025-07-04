@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import pLimit from 'p-limit';
+import promiseLimit from 'promise-limit';
 
 import { ArticleService } from '../articles';
 import { CrawlerService } from '../crawler';
@@ -20,7 +20,7 @@ export class RssScheduler {
     private readonly crawlerService: CrawlerService,
   ) {}
 
-  @Cron(CronExpression.EVERY_30_MINUTES)
+  @Cron(CronExpression.EVERY_5_MINUTES)
   async crawlScheduledFeeds(): Promise<void> {
     if (this.isRunning) {
       this.logger.warn('⚠️ RSS crawl skipped: previous job still running.');
@@ -66,19 +66,16 @@ export class RssScheduler {
   }
 
   private async processFeed(items: RssItem[]) {
-    const limit = pLimit(5);
+    const limit = promiseLimit(5);
 
     await Promise.all(
-      items.map(async (item) =>
+      items.map((item) =>
         limit(async () => {
           const { title, content } = await this.crawlerService.crawlArticle(
             item.link,
           );
           await this.articleService.createIfNotExists(
-            {
-              title,
-              content,
-            },
+            { title, content },
             this.USER_ID,
           );
         }),
