@@ -12,20 +12,18 @@ export class UserRepository {
   ) {}
 
   async findAll(): Promise<UserEntity[]> {
-    return this.repository.find({ relations: { articles: true } });
+    return this.repository.find();
   }
 
   async findById(id: string): Promise<UserEntity | null> {
     return this.repository.findOne({
       where: { id },
-      relations: { articles: true },
     });
   }
 
   async findByEmail(email: string): Promise<UserEntity | null> {
     return this.repository.findOne({
       where: { email },
-      relations: { articles: true },
     });
   }
 
